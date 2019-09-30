@@ -1,1 +1,1 @@
-ICO_Example
+ICO_Onboarding

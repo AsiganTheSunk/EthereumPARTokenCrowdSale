@@ -1,0 +1,23 @@
+{
+  "name": "ico_onboarding",
+  "version": "1.0.0",
+  "description": "Onboarding Development for Ethereum Environment",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "asiganthesunk"
+  },
+  "author": "asiganthesunk",
+  "license": "ISC",
+  "dependencies": {
+    "canonical-weth": "^1.4.0",
+    "openzeppelin-solidity": "^2.3.0",
+    "truffle-contract": "^4.0.31"
+  }
+}
