@@ -5,14 +5,14 @@ pragma solidity ^0.5.0;
 import '../node_modules/openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 
 contract ICOCrowdSale {
-    using SafeMath for uint256; 
+    using SafeMath for uint256;
 
     // Addresses for Owner & Wallet
     address public owner;
     address public ETHWallet;
 
     // ICOCroweSale Currency State
-    ERC20 public ScamToken;
+    ERC20 public PAR_Token;
     bool private isFunding;
     bool public ICOCompleted;
     uint256 public tokenExchangeRate;
@@ -86,7 +86,7 @@ contract ICOCrowdSale {
         totalMinted += heldTotal;
     }
 
-        // function to release held tokens for developers
+    // function to release held tokens for developers
     function releaseHeldCoins() external {
         uint256 held = heldTokens[msg.sender];
         uint heldBlock = heldTimeLine[msg.sender];
@@ -102,6 +102,7 @@ contract ICOCrowdSale {
     function contribute() external payable {
         require(msg.value > 0, '');
         require(isFunding, '');
+
         require(block.number <= endBlock, '');
 
     }

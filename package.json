@@ -18,6 +18,7 @@
   "dependencies": {
     "canonical-weth": "^1.4.0",
     "openzeppelin-solidity": "^2.3.0",
+    "safemath": "^1.0.6",
     "truffle-contract": "^4.0.31"
   }
 }
