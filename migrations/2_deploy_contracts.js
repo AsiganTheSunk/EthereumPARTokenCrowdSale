@@ -16,12 +16,10 @@ module.exports = async function (deployer, network, accounts) {
     const goal = "10000000000000"
   
     await deployer.deploy(MyTokenCrowdSale, openingTime, closingTime, rate, wallet, cap, token.address, goal);
-  
+
 
     const crowdsale = await MyTokenCrowdSale.deployed();
-  
+
     await token.addMinter(crowdsale.address);
     await token.renounceMinter();
-  
-    await crowdsale.setCap(accounts[0], "100000000000000000000")
   };
