@@ -1,1 +1,1 @@
-Gnosis Onboarding Token CrowdSale.
+ # Gnosis Onboarding PAR Token CrowdSale.
