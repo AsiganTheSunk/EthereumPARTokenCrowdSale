@@ -1,1 +1,1 @@
-ICO_Onboarding
+Gnosis Onboarding Token CrowdSale.
