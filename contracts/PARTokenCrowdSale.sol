@@ -11,6 +11,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+pragma solidity ^0.5.0;
+
 /*
  *  @dev Import Ownable Module from OpenZeppelin.
 */
@@ -19,12 +21,7 @@ import "openzeppelin-solidity/contracts/crowdsale/distribution/RefundableCrowdsa
 import "openzeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
-
-/*
- *  @dev Import Module Cannonical-Weth.
-*/
-import "canonical-weth/contracts/WETH9.sol";
-
+import "./PARToken.sol";
 
 /**
  * @title PARTokenCrowdSale
@@ -40,21 +37,18 @@ import "canonical-weth/contracts/WETH9.sol";
  * After adding multiple features it's good practice to run integration tests
  * to ensure that subcontracts works together as intended.
  */
-contract PARTokenCrowdSale is CappedCrowdsale, RefundableCrowdsale, MintedCrowdsale {
+contract PARTokenCrowdSale is CappedCrowdsale, RefundableCrowdsale {
     constructor (
-        uint256 openingTime,
-        uint256 closingTime,
         uint256 rate,
         address payable wallet,
         uint256 cap,
-        ERC20Mintable token,
+        PARToken token,
         uint256 goal
     )
 
     public
     Crowdsale(rate, wallet, token)
     CappedCrowdsale(cap)
-    TimedCrowdsale(openingTime, closingTime)
     RefundableCrowdsale(goal)
     {
         //As goal needs to be met for a successful crowdsale
