@@ -10,7 +10,7 @@ contract TestPARToken {
 
         uint expected = 10000;
 
-        Assert.equal(myToken.getBalance(tx.origin), expected, "Owner should have 10000 MetaCoin initially");
+        Assert.equal(myToken.getBalance(tx.origin), expected, "Owner should have 10000 PARToken Initially");
     }
 
     function testInitialBalanceWithNewMetaCoin() public {
@@ -20,4 +20,5 @@ contract TestPARToken {
 
         Assert.equal(meta.getBalance(tx.origin), expected, "Owner should have 10000 PARToken Initially");
     }
+    
 }

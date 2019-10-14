@@ -11,33 +11,47 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+//import "openzeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
+//import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
+
+// Current Solidity Version
 pragma solidity ^0.5.0;
 
 /*
- *  @dev Import Ownable Module from OpenZeppelin.
-*/
+ * @title Imports
+ * Import Ownable Module from OpenZeppelin Library
+ * Import CappedCrowdSale Module from OpenZeppelin Library
+ * Import RefundableCrowdSale Module from OpenZeppelin Library
+ * Import Token Contract from ./PARToken.sol
+ */
 import "openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 import "openzeppelin-solidity/contracts/crowdsale/distribution/RefundableCrowdsale.sol";
-import "openzeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 import "./PARToken.sol";
 
 /**
  * @title PARTokenCrowdSale
- * @dev This is an example of a fully fledged crowdsale.
- * The way to add new features to a base crowdsale is by multiple inheritance.
- * In this example we are providing following extensions:
+ * @dev This is an Example of a Fully Fledged CrowdSale Contract.
  *
- * CappedCrowdsale - sets a max boundary for raised funds
- * RefundableCrowdsale - set a min goal to be reached and returns funds if it's not met
- * MintedCrowdsale - assumes the token can be minted by the crowdsale, which does so
- * when receiving purchases.
+ * The Way to Add New Features to a Base CrowdSale is by Multiple Inheritance, for this Contract, we will use
+ * the following Extensions:
  *
- * After adding multiple features it's good practice to run integration tests
- * to ensure that subcontracts works together as intended.
+ * CappedCrowdsale - With this Contract Implementation we sets a max Boundary for Raised Funds
+ * RefundableCrowdsale - With this Contract Implementation set a min Goal to be Reached and Returns Funds
+ * if it's not met
+ *
  */
 contract PARTokenCrowdSale is CappedCrowdsale, RefundableCrowdsale {
+
+    /**
+     * @param rate - Value Defining the Current Rate for the PARToken CrowdSale Exchange
+     * @param wallet - Value Defining the Current Address for the Source Wallet for the PARToken CrowdSale
+     * @param cap - Value Defining the Current Cap for the PARToken CrowdSale Exchange
+     * @param token - Value Defining the Current Token for the PARToken CrowSale Exchange
+     * @param goal - Value Defining the Current Goal for the PARToken CrowdSale Exchange
+     */
+
     constructor (
         uint256 rate,
         address payable wallet,
@@ -46,13 +60,18 @@ contract PARTokenCrowdSale is CappedCrowdsale, RefundableCrowdsale {
         uint256 goal
     )
 
+    /**
+     * Constructor for the PARTokenCrowdSale Contract
+     */
     public
     Crowdsale(rate, wallet, token)
     CappedCrowdsale(cap)
     RefundableCrowdsale(goal)
     {
-        //As goal needs to be met for a successful crowdsale
-        //the value needs to less or equal than a cap which is limit for accepted funds
+        /**
+         * As the Goal needs to be met, in order to have a Successfull PARToken Crowdsale Exchange,
+         * the Value needs to be less or equal than the Cap which is the Current Limit for Accepted Funds.
+         */
         require(goal <= cap, "SampleCrowdSale: goal is greater than cap");
     }
 }
