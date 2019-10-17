@@ -115,9 +115,6 @@ contract CustomCrowdsale is TimedCrowdsale, CappedCrowdsale, RefundableCrowdsale
 //        balances[_beneficiary] = _newContribution;
 //    }
 
-    //    event Claim(address indexed user, uint amount);
-//    event Invest(address indexed user, uint amount);
-//    event Closed(address user, uint when);
 //
 //
 //    function buyToken(uint _amount) public returns (bool) {
@@ -136,15 +133,4 @@ contract CustomCrowdsale is TimedCrowdsale, CappedCrowdsale, RefundableCrowdsale
 //    }
 //
 //
-//    function claimToken() public returns (bool) {
-//        require(closedOn > 0 && (closedOn + 2 minutes) < now, "ICO is not Completed");
-//        uint tokens = balances[msg.sender] * scmPerWeth;
-//        bool tokensFound = tokens > 0;
-//        if (tokensFound) {
-//            tokenSCM.transfer(msg.sender, tokens);
-//            delete balances[msg.sender];
-//            emit Claim(msg.sender, tokens);
-//        }
-//        return tokensFound;
-//    }
 }

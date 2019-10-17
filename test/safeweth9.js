@@ -39,61 +39,32 @@ contract('SafeWETH9', (accounts) => {
         assert.equal(decimals.valueOf(), expected_decimals, 'SafeWETH9 Contract does not comply with the Expected Decimal Value.');
     });
 
-    it('[ Attack Vector ]: Contract should be able to Withstand OverFlow Attacks on withdraw() using SafeMath', async () => {
+    it('[ Tx ]: Contract should be able to Reject Negative deposit()', async () => {
         try {
             // Default Values.
-            var accountOne = accounts[0];
-
             var mySafeWeth9Instance = await mySafeWeth.deployed();
-
-            var amount = 1000;
-            var malicious_amount = 999999999999999;
-            //var malicious_amount = 1000;
-            // Make A Deposit Of a Negative Value.
-            await mySafeWeth9Instance.deposit({'sender':accountOne, 'value': amount})
-            var data = await mySafeWeth9Instance.totalSupply();
-            console.log(data);
-            await mySafeWeth9Instance.deposit({'sender':accountOne, 'value': malicious_amount});
-            var data = await mySafeWeth9Instance.totalSupply();
-            console.log(data);
-
-        } catch (error) {
-            console.log(error);
-            assert.equal(error.message, 'Returned error: VM Exception while processing transaction: revert Not enough Ether to Withdraw!! -- Reason given: Not enough Ether to Withdraw!!.', "This Contract is vulnerable to OverFlow Attacks");
-        }
-    });
-
-    it('[ Attack Vector ]: Contract should be able to reject negative deposit()', async () => {
-        try {
-            // Default Values.
-            var accountOne = accounts[0];
-
-            var mySafeWeth9Instance = await mySafeWeth.deployed();
-
             var malicious_amount = -1001;
 
-            // Make A Deposit Of a Negative Value.
+            // Make A Deposit of a Negative Value.
             await mySafeWeth9Instance.deposit({'value': malicious_amount});
 
-
         } catch (error) {
-            console.log(error)
             assert.equal(error.message, 'Returned error: VM Exception while processing transaction: revert Not enough Ether to Withdraw!! -- Reason given: Not enough Ether to Withdraw!!.', "This Contract is vulnerable to OverFlow Attacks");
         }
     });
 
-    it('[ Attack Vector ]: Contract should not be able to withdraw() more tokens than the account it is holding', async () => {
+    it('[ Tx ]: Contract should be able to Reject withdraw() for more tokens than the balance deposited', async () => {
         try {
             // Default Values.
             var accountOne = accounts[0];
-
             var mySafeWeth9Instance = await mySafeWeth.deployed();
 
             var amount = 1000;
             var malicious_amount = -1001;
 
-            // TODO: Comment
+             // Make A Deposit of a Positive Value.
             await mySafeWeth9Instance.deposit({'value': amount});
+             // Make A Deposit of a Negative Value.
             await mySafeWeth9Instance.withdraw(malicious_amount);
 
         } catch (error) {

@@ -7,15 +7,14 @@ pragma solidity >=0.5.0 <0.6.0;
  * Import SafeMath Module from OpenZeppelin Library
  * Import Convert Library Contract from ./ConvertLib.sol
  */
-
-import "../lib/ConvertLib.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../lib/ConvertLib.sol";
 
 /**
  * @title CustomToken
  * @dev Very Simple ERC20Detailed Token.
- * It is meant to be used in the PARToken CrowdSale Contract.
+ * It is meant to be used in the CustomCrowdsale Contract.
  */
 
 contract CustomToken is ERC20Detailed {
@@ -24,22 +23,18 @@ contract CustomToken is ERC20Detailed {
       */
     using SafeMath for uint256;
 
-
     mapping (address => uint256)                       public  balanceOf;
     mapping (address => mapping (address => uint256))  public  allowance;
 
-
-    uint256 convertRate = 10;
     /**
      * Transfer Event
      */
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     /**
-      * Constructor for the PARToken Contract
+      * Constructor for the Custom Token Contract
       */
     constructor (uint256 _amount) public ERC20Detailed("Custom Token Currency", "CTC", 18) {
-        //tokenRate = 10;
         balanceOf[msg.sender] = _amount;
     }
 

@@ -95,7 +95,7 @@ contract('CustomToken', (accounts) => {
         }
     });
 
-    it('[ Attack Vector ]: Contract should be able to Withstand OverFlow Attacks on transfer() using SafeMath', async () => {
+    it('[ Tx ]: Contract should be able to Withstand OverFlow on transfer() using SafeMath', async () => {
         try {
             // Default Values.
             var accountOne = accounts[0];
@@ -115,7 +115,7 @@ contract('CustomToken', (accounts) => {
             }
     });
 
-    it('[ Attack Vector ]: Contract should be able to Withstand UnderFlow Attacks on transfer() using SafeMath', async () => {
+    it('[ Tx ]: Contract should be able to Withstand UnderFlow on transfer() using SafeMath', async () => {
         try {
             // Default Values.
             var accountOne = accounts[0];
