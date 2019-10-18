@@ -43,10 +43,7 @@ contract CustomCrowdsale is TimedCrowdsale, CappedCrowdsale, RefundableCrowdsale
      * @param goal - Value Defining the Current Goal for the PARToken CrowdSale Exchange
      */
 
-    uint256 public constant wethToRaise = 1000 ether;
-    uint256 public constant tokenExchangeRate = 10;
-    uint256 public heldTotal;
-    uint256 public tokenAddress;
+    uint256 public constant wethToRaise = 10 ether;
     uint256 public releaseTime;
     uint256 public investorHardCap;
     // Mapping for _spender money

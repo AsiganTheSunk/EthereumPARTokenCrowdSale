@@ -30,16 +30,16 @@ module.exports = async function(deployer, accounts, [owner]) {
     var releaseTime = closingTime + duration.minutes(2);
 
     // Default Cap/Goal Contraints for the CustomCrowdsale Contract
-    var rate        = 10;
+    var rate        = 1;
     var cap         = 100;
-    var goal        = 50;
+    var goal        = 5;
 
     deployer.deploy(myCustomCrowdSale, rate, owner, cap, openingTime, closingTime,
                     myCustomToken.address, goal, mySafeWETH9.address, releaseTime).then(async () => {
 
-        var myCustomTokenInstance = await myCustomToken.deployed();
         var mySafeWETH9Instance = await mySafeWETH9.deployed();
         var myWETH9Instance = await myWETH9.deployed();
+        var myCustomTokenInstance = await myCustomToken.deployed();
         var totalSupply = await myCustomTokenInstance.totalSupply();
 
         // Transfer CustomTokens To the Crowdsale Contract

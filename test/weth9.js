@@ -1,8 +1,9 @@
 var mySafeWeth = artifacts.require("../contracts/tokens/SafeWETH9.sol");
+var myWeth = artifacts.require("canonical-weth/contracts/WETH9.sol");
 
 // Test UnderFlow/OverFlow Attacks in WETH9, SafeWETH9 & CustomToken
 
-contract('SafeWETH9', (accounts) => {
+contract('WETH9', (accounts) => {
       it('[ Init ]: Contract should have a Default Name of Wrapped Ether', async () => {
 
             // Default Values
@@ -64,8 +65,32 @@ contract('SafeWETH9', (accounts) => {
 
              // Make A Deposit of a Positive Value.
             await mySafeWeth9Instance.deposit({'value': amount});
-             // Make A Deposit of a Negative Value.
+
+            // Make A Deposit of a Negative Value.
             await mySafeWeth9Instance.withdraw(malicious_amount);
+
+        } catch (error) {
+            assert.equal(error.message, 'Returned error: VM Exception while processing transaction: revert Not enough Ether to Withdraw!! -- Reason given: Not enough Ether to Withdraw!!.', "This Contract is vulnerable to UnderFlow Attacks");
+        }
+    });
+
+    it('[ Tx TEST ]: *****************', async () => {
+        try {
+            // Default Values.
+            var accountOne = accounts[0];
+            var myWethInstance = await myWeth.deployed();
+
+            var amount = 1000;
+            //var malicious_amount = -1001;
+
+             // Make A Deposit of a Positive Value.
+            await myWethInstance.deposit({'value': amount});
+            var currentBalance = (await myWethInstance.totalSupply()).toNumber();
+
+            //var convertedTokens = (await myCustomTokenInstance.getBalanceInEth.call(accountOne)).toNumber();;
+            console.log(currentBalance);
+             // Make A Deposit of a Negative Value.
+            //await mySafeWeth9Instance.withdraw(malicious_amount);
 
         } catch (error) {
             assert.equal(error.message, 'Returned error: VM Exception while processing transaction: revert Not enough Ether to Withdraw!! -- Reason given: Not enough Ether to Withdraw!!.', "This Contract is vulnerable to UnderFlow Attacks");
