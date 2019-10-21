@@ -61,9 +61,7 @@ contract CustomCrowdsale is Ownable {
         if (_contribution + currentContribution >= contributionGoal) {
             _contribution = contributionGoal.sub(currentContribution);
             require(_contribution >= 0, 'There is no more tokens');
-
         }
-
         require(weth9.transfer(address(this), _contribution), "Unable to transfer");
         currentContribution = currentContribution.add(_contribution);
         contributions[msg.sender] += contributions[msg.sender].add(_contribution);
@@ -118,5 +116,9 @@ contract CustomCrowdsale is Ownable {
 
     function getReleaseTime() public view returns (uint256) {
         return releaseTime;
+    }
+
+    function getTokens() public view returns (uint256) {
+        return token.totalSupply();
     }
 }

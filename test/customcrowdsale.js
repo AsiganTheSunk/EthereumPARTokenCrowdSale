@@ -14,6 +14,7 @@ const duration = {
   years: function (val) { return val * this.days(365); },
 };
 
+
 contract('CustomCrowdsale', (accounts) => {
 
     it('[ Init ]: Contract should have a Default Rate of 2', async () => {
@@ -147,6 +148,11 @@ contract('CustomCrowdsale', (accounts) => {
             // var expected_isCompleted = true;
             // assert.equal(isCompleted.valueOf(), expected_isCompleted, 'CustomCrowdsale Contract Should have a hasClosed of false');
 
+            //smyCustomCrowdsaleInstance.token.totalSupply().call(accounts[0]);
+            await myCustomCrowdsaleInstance.buyToken({ value: 1, from: investorOne });
+            var currentTokens = await myCustomCrowdsaleInstance.getTokens();
+            //assert.isTrue(newTotalSupply > originalTotalSupply);
+            console.log('totalSupply of Tokens ' + currentTokens);
 
 
         } catch(error) {
