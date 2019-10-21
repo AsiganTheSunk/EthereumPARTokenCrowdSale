@@ -10,6 +10,7 @@ pragma solidity >=0.5.0 <0.6.0;
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../lib/ConvertLib.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
  * @title CustomToken
@@ -17,7 +18,7 @@ import "../lib/ConvertLib.sol";
  * It is meant to be used in the CustomCrowdsale Contract.
  */
 
-contract CustomToken is ERC20Detailed {
+contract CustomToken is ERC20Detailed, Ownable {
     /**
       * Use SafeMath for uint256 Operations to prevent UnderFlow/OverFlow
       */

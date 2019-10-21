@@ -1,133 +1,123 @@
 // Current Solidity Version
 pragma solidity >=0.5.0 <0.6.0;
 
-/*
- * @title Imports
- * Import Ownable Module from OpenZeppelin Library
- * Import CappedCrowdSale Module from OpenZeppelin Library
- * Import RefundableCrowdSale Module from OpenZeppelin Library
- * Import Token Contract from ./PARToken.sol
- */
-import "openzeppelin-solidity/contracts/crowdsale/distribution/PostDeliveryCrowdsale.sol";
-import "openzeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol";
-import "openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
-import "openzeppelin-solidity/contracts/crowdsale/distribution/RefundableCrowdsale.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 import "./tokens/CustomToken.sol";
 import "canonical-weth/contracts/WETH9.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/crowdsale/emission/AllowanceCrowdsale.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol";
 
-/**
- * @title PARTokenCrowdSale
- * @dev This is an Example of a Fully Fledged CrowdSale Contract.
- *
- * The Way to Add New Features to a Base CrowdSale is by Multiple Inheritance, for this Contract, we will use
- * the following Extensions:
- *
- * CappedCrowdsale - With this Contract Implementation we set a max Boundary for Raised Funds
- * RefundableCrowdsale - With this Contract Implementation we set a min Goal to be Reached and Returns Funds
- * if it's not met
- * TimedCrowdsale - With this Contract Implementation we set a Time frame for the Funds to be Raised
- *
- *
- */
-contract CustomCrowdsale is TimedCrowdsale, CappedCrowdsale, RefundableCrowdsale, AllowanceCrowdsale {
-
+contract CustomCrowdsale is Ownable {
     using SafeMath for uint256;
-    /**
-     * @param rate - Value Defining the Current Rate for the PARToken CrowdSale Exchange
-     * @param wallet - Value Defining the Current Address for the Source Wallet for the PARToken CrowdSale
-     * @param cap - Value Defining the Current Cap for the PARToken CrowdSale Exchange
-     * @param token - Value Defining the Current Token for the PARToken CrowSale Exchange
-     * @param goal - Value Defining the Current Goal for the PARToken CrowdSale Exchange
-     */
 
-    uint256 public constant wethToRaise = 10 ether;
-    uint256 public releaseTime;
-    uint256 public investorHardCap;
-    // Mapping for _spender money
-    mapping(address => uint) public balances;
+    // Attr of the Custom Crowdsale
     WETH9 public weth9;
+    ERC20Detailed public token;
+    uint256 public rate = 2;
+    uint256 public cap = 10 ether;
+    bool public ICOCompleted = false;
+    uint256 public contributionGoal = 50 ether;
+    uint256 public currentContribution = 0 ether;
+    uint256 public staringTime;
+    uint256 public closingTime;
+    uint256 public releaseTime;
+    uint256 public numberOfContributions;
 
-    /**
- * Constructor for the CustomCrowdSale Contract
- */
-    // Address payable will be
-    constructor (uint256 rate, address wallet, uint256 cap, uint256 _openingTime, uint256 _closingTime, CustomToken token, uint256 goal, address payable wethAddr, uint256 _releaseTime)
-    public
-    Crowdsale(rate, address(uint160(wallet)), token)
-    CappedCrowdsale(cap)
-    RefundableCrowdsale(goal)
-    TimedCrowdsale(_openingTime, _closingTime)
-    AllowanceCrowdsale(wethAddr)
-    {
-        /**
-         * As the Goal needs to be met, in order to have a Successfull PARToken Crowdsale Exchange,
-         * the Value needs to be less or equal than the Cap which is the Current Limit for Accepted Funds.
-         */
-        require(goal <= cap, "CustomCrowdSale: goal is greater than cap");
-        releaseTime = _releaseTime;
+    // Mapping of the Contributions
+    mapping (address => uint256) public contributions;
+
+    // Events to track during the crowdsale
+    event Contribution(address _from, uint256 _amount);
+    event ClaimContribution(address _from, uint256 _amount);
+    event CloseCrowdsale(address _from, uint256 time);
+
+    // Setting Up Modifiers for the Finalize Function
+    modifier whenICOCompleted {
+        require(ICOCompleted, 'Token ICO not Completed!!');
+        _;
     }
 
-    /**
-     * The address and address payable types both store a 160-bit Ethereum address. The concept of payable
-     * and non-payable addresses only exists in the Solidity type system at compile-time. The difference between
-     * payable and non-payable addresses is gone in the compiled contract code.
-     */
-//    function buyToken(address payable wallet, uint256 _amount) public {
-//        require(amount + heldTotal <= goal);
-//
-//        // hacer set a 0 medida preventiva en el allowance
-//        // hacer approve x cantidad de pasta al weth9 tokenAddress
-//        // hacer el allowance x cantidad de pasta al weth9 tokenAddress
-//    }
+    // Constructor for the CustomCrowdsale
+    constructor(uint256 _rate, uint256 _cap, uint256 _contributionGoal, address _wethAddr, address _tokenAddr, uint256 _staringTime, uint256 _closingTime, uint256 _releaseTime) public {
+        closingTime = _closingTime;
+        staringTime = _staringTime;
+        releaseTime = _releaseTime;
+        rate = _rate;
+        cap = _cap;
+        contributionGoal = _contributionGoal;
+        token = CustomToken(address(uint160(_tokenAddr)));
+        weth9 = WETH9(address(uint160(_wethAddr)));
 
-    /**
-      * @dev Returns the amount contributed so far by a sepecific user.
-      * @param _beneficiary Address of contributor
-      * @return User contribution so far
-      */
-//        function getUserContribution(address _beneficiary)
-//        public view returns (uint256)
-//        {
-//            return balances[_beneficiary];
-//        }
+        require(staringTime >= block.timestamp, "Opening time is before current time");
+        require(closingTime > staringTime, "Opening time is not before closing time");
+        require(cap > 0, 'Cap value must be more than 0');
+        require(contributionGoal > 0, 'Goal value must be more than 0');
+        require(contributionGoal > cap, 'Goal value must be more than Cap value');
+    }
 
-    /**
-* @dev Extend parent behavior requiring purchase to respect investor min/max funding cap.
-* @param _beneficiary Token purchaser
-* @param _weiAmount Amount of wei contributed
-*/
-//    function _preValidatePurchase(
-//        address _beneficiary,
-//        uint256 _weiAmount
-//    )
-//    internal onlyWhileOpen
-//    {
-//        super._preValidatePurchase(_beneficiary, _weiAmount);
-//        uint256 _existingContribution = balances[_beneficiary];
-//        uint256 _newContribution = _existingContribution.add(_weiAmount);
-//        require(_newContribution <= investorHardCap);
-//        balances[_beneficiary] = _newContribution;
-//    }
+    // Buy Funtion for the Custom Crowdsale
+    function buyToken(uint256 _contribution) public returns (bool){
+        //require (_contribution >= 0);
+        if (_contribution + currentContribution >= contributionGoal) {
+            _contribution = contributionGoal.sub(currentContribution);
+            require(_contribution >= 0, 'There is no more tokens');
+            closeICO();
+            emit CloseCrowdsale(msg.sender, now);
+        }
 
-//
-//
-//    function buyToken(uint _amount) public returns (bool) {
-//        require(_amount + storedWeth >= wethToRaise, 'Not Enough Tokens');
-//        _amount = wethToRaise.sub(storedWeth);
-//
-//        closedOn = now;
-//        emit Closed(msg.sender, closedOn);
-//
-//        require(weth9.transferFrom(msg.sender, address(this), _amount), "Cannot transfer WEth");
-//        storedWeth = storedWeth.add(_amount);
-//        balances[msg.sender] = balances[msg.sender].add(_amount);
-//
-//        emit Invest(msg.sender, _amount);
-//        return true;
-//    }
-//
-//
+        require(weth9.transfer(address(this), _contribution), "Unable to transfer");
+        currentContribution = currentContribution.add(_contribution);
+        contributions[msg.sender] += contributions[msg.sender].add(_contribution);
+        emit Contribution(msg.sender, _contribution);
+        return true;
+    }
+
+    function closeICO() public onlyOwner returns (bool) {
+        ICOCompleted = true;
+        return true;
+    }
+
+    function claimContribution() public whenICOCompleted returns (bool) {
+        //require(closedOn > 0 && (closedOn + 2 minutes) < now, "Ico not closed");
+        uint currentTokens = contributions[msg.sender] * rate;
+
+        if (currentTokens > 0) {
+            token.transfer(msg.sender, currentTokens);
+            delete contributions[msg.sender];
+            emit ClaimContribution(msg.sender, currentTokens);
+        }
+        return true;
+    }
+
+    function getRate() public view returns (uint256) {
+        return rate;
+    }
+
+    function getCap() public view returns (uint256) {
+        return cap;
+    }
+
+    function getGoal() public view returns (uint256) {
+        return contributionGoal;
+    }
+
+    function isCompleted() public view returns (bool) {
+        return ICOCompleted;
+    }
+
+    function getCurrentContribution() public view returns (uint256) {
+        return currentContribution;
+    }
+
+    function getStarting() public view returns (uint256) {
+        return staringTime;
+    }
+
+    function getClosingTime() public view returns (uint256) {
+        return closingTime;
+    }
+
+    function getReleaseTime() public view returns (uint256) {
+        return releaseTime;
+    }
 }

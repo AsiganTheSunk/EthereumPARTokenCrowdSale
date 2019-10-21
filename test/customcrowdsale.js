@@ -14,154 +14,116 @@ const duration = {
   years: function (val) { return val * this.days(365); },
 };
 
-
 contract('CustomCrowdsale', (accounts) => {
 
-
-    it('[ Init ]: Contract should have a Default Rate of 10', async () => {
+    it('[ Init ]: Contract should have a Default Rate of 2', async () => {
         // Default Values
-        var expected_rate = 10;
+        var expected_rate = 2;
         var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
 
-        // Transfer token ownership to crowdsale
-        var rate = await myCustomCrowdsaleInstance.rate();
-        assert.equal(rate.valueOf(), expected_rate, 'CustomCrowdsale Contract Should have a Rate of 10');
+        // Current Rate Value
+        var rate = await myCustomCrowdsaleInstance.getRate();
+        assert.equal(rate.toNumber(), expected_rate, 'CustomCrowdsale Contract Should have a Rate of 2');
     });
 
 
-    it('[ Init ]: Contract should have a Default Cap of 100', async () => {
-        // Default Values
-        var expected_cap = 100;
+    it('[ Init ]: Contract should have a Default Cap of 10', async () => {
+        // Await Deployment
         var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
 
-        // Transfer token ownership to crowdsale
-        var cap = await myCustomCrowdsaleInstance.cap();
-        assert.equal(cap.valueOf(), expected_cap, 'CustomCrowdsale Contract Should have a Cap of 100');
+        // Expected Value for Contract
+        var expected_cap = 10;
+
+        // Current Cap Default Value for Contract
+        var cap = await myCustomCrowdsaleInstance.getCap();
+        assert.equal(cap.toNumber(), expected_cap, 'CustomCrowdsale Contract Should have a Cap of 100');
 
     });
 
     it('[ Init ]: Contract should have a Default Goal 50', async () => {
+        var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
+
+        // Expected Value for Contract
         var expected_goal = 50;
-        var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
 
-        // Default Values
-        var goal = await myCustomCrowdsaleInstance.goal();
-        assert.equal(goal.valueOf(), expected_goal, 'CustomCrowdsale Contract Should have a Goal of 100');
+        // Current Goal Default Value for Contract
+        var goal = await myCustomCrowdsaleInstance.getGoal();
+        assert.equal(goal.toNumber(), expected_goal, 'CustomCrowdsale Contract Should have a Goal of 100');
     });
 
 
-    it('[ Init ]: Contract should have a Default WeiRaised of 0', async () => {
-        var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
-        var expected_weiRaised = 0;
-
-        var weiRaised  = await myCustomCrowdsaleInstance.weiRaised();
-        assert.equal(weiRaised.valueOf(), expected_weiRaised, 'CustomCrowdsale Contract Should have a weiRaised of 0');
-    });
-
-    it('[ Init ]: Contract should have a Default isOpen of false', async () => {
-        var expected_isOpen = false;
+    it('[ Init ]: Contract should have a Default currentContribution of 0', async () => {
         var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
 
-        var isOpen =  await myCustomCrowdsaleInstance.isOpen();
-        assert.equal(isOpen.valueOf(), expected_isOpen, 'CustomCrowdsale Contract Should have a isOpen of false');
+        // Expected Value for Contract
+        var expected_currentContribution = 0;
+
+        var currentContribution  = await myCustomCrowdsaleInstance.getCurrentContribution();
+        assert.equal(currentContribution.toNumber(), expected_currentContribution, 'CustomCrowdsale Contract Should have a currentContribution of 0');
     });
 
-    it('[ Init ]: Contract should have a Default hasClosed of false', async () => {
-        var expected_hasClosed = false;
+    it('[ Init ]: Contract should have a Default isCompleted of false', async () => {
+        var expected_isCompleted = false;
         var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
 
-        var hasClosed =  await myCustomCrowdsaleInstance.hasClosed();
-        assert.equal(hasClosed.valueOf(), expected_hasClosed, 'CustomCrowdsale Contract Should have a hasClosed of false');
+        var isCompleted =  await myCustomCrowdsaleInstance.isCompleted();
+        assert.equal(isCompleted.valueOf(), expected_isCompleted, 'CustomCrowdsale Contract Should have a hasClosed of false');
     });
 
-    it('[ Init ]: Contract should have a Default tokenWallet of * ', async () => {
-        var expected_tokenWallet = 0;
-        var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
-
-        var tokenWallet =  await myCustomCrowdsaleInstance.remainingTokens();
-        assert.equal(tokenWallet.valueOf(), expected_tokenWallet, 'CustomCrowdsale Contract Should have a hasClosed of false');
-    });
-
-    it('[ Init ]: Contract should have a Default remainingTokens of * ', async () => {
-        var expected_remainingTokens = 0;
-        var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
-
-        var remainingTokens =  await myCustomCrowdsaleInstance.remainingTokens();
-        assert.equal(remainingTokens.valueOf(), expected_remainingTokens, 'CustomCrowdsale Contract Should have a remainingTokens of 0');
-    });
 
     it('[ TEST ]: * ', async () => {
         var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
         const value = new web3.utils.BN(web3.utils.toWei("1", 'ether'));
         const purchaser = accounts[2];
         const investor1 = accounts[4];
-
-        var openingTime = (await myCustomCrowdsaleInstance.openingTime()).toNumber();
-        console.log(openingTime);
-
-        var actualTime = await time.latest();
-        console.log(actualTime.toNumber());
-
-        var newTime = await time.increaseTo(openingTime + duration.minutes(2));
-        await myCustomCrowdsaleInstance.buyTokens(investor1, { value: value, from: purchaser }).should.be.fulfilled;
+//
+//        var openingTime = (await myCustomCrowdsaleInstance.openingTime()).toNumber();
+//        console.log(openingTime);
+//
+//        var actualTime = await time.latest();
+//        console.log(actualTime.toNumber());
+//
+//        var newTime = await time.increaseTo(openingTime + duration.minutes(2));
+//        await myCustomCrowdsaleInstance.buyTokens(investor1, { value: value, from: purchaser }).should.be.fulfilled;
     });
 
     it('[ Tx ]: Contract should have a Default remainingTokens of * ', async () => {
         try {
-
-            var accountOne = accounts[0];
             var myTokenInstance = await myToken.deployed();
             var myWethInstance = await myWeth.deployed();
+
+            var investorOne = accounts[1];
+            var investorTwo = accounts[2];
+            var investorThree = accounts[3];
+
+            var expected_isCompleted = false;
+
             var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
 
-            var wethToRaise = (await myCustomCrowdsaleInstance.wethToRaise()).valueOf();
-            var rate = (await myCustomCrowdsaleInstance.rate()).valueOf();
+            var goal = (await myCustomCrowdsaleInstance.getGoal()).toNumber();
+            var rate = (await myCustomCrowdsaleInstance.getRate()).toNumber();
 
-            var amount = 1000;
-            await myWethInstance.deposit({'value': amount});
+            //var totalAllowedInvestment = goal - ether('1')
+            await myWethInstance.deposit({'value': ether('1')});
 
-            var currentWethBalance = (await myWethInstance.totalSupply()).toNumber();
-            //console.log(currentWethBalance.valueOf());
+            //console.log(amount.valueOf());
+            //console.log(total.valueOf());
+
+            var currentWethBalance = (await myWethInstance.totalSupply()).valueOf();
+            console.log(currentWethBalance);
+            //assert.equal(currentWethBalance, ether('1').valueOf(), 'myWethInstance Contract Should have 1 ether as currentWethBalance');
+
+            await myWethInstance.approve(myCustomCrowdsale.address, currentWethBalance);
+            //await myWethInstance.approve(investorOne, ether('1')});
             //console.log(isApproved.valueOf());
 
-            assert.equal(currentWethBalance, amount);
-            var isApproved = await myWethInstance.approve(myCustomCrowdsale.address, amount);
+            // var isCompleted =  await myCustomCrowdsaleInstance.isCompleted();
+            // assert.equal(isCompleted.valueOf(), expected_isCompleted, 'CustomCrowdsale Contract Should have a hasClosed of false');
 
-            var hasClosed =  await myCustomCrowdsaleInstance.hasClosed();
-            assert.equal(hasClosed.valueOf(), false);
+            //await myCustomCrowdsaleInstance.buyToken(1);
 
-
-            //assert.ok(myCustomCrowdsale.buyTokens(weisToInvest, ))
-            //        assert.equal(await icoSCM.closedOn(), 0)
         } catch(error) {
             console.log(error);
         }
-
-//
-//        // Invest everything - 1 ether
-//        assert.ok(icoSCM.invest(weisToInvest))
-//        assert.equal(await icoSCM.closedOn(), 0)
-//
-//        // Invest remaining 1 ether
-//        assert.ok(icoSCM.invest(totalWeisToInvest - weisToInvest))
-//        assert.equal(await icoSCM.balances.call(accounts[0]), totalWeisToInvest)
-//
-//        // Now ico should be closed
-//        assert.ok(await icoSCM.closedOn() > 0)
-//
-//        // Try to get the tokens from the Ico
-//        var expectedTokens = scmPerWeth * totalWeisToInvest
-//        try {
-//         await icoSCM.claim()
-//         assert.fail('Exception not raised')
-//        } catch (error) {
-//        }
-//
-//        // Go 2 minutes in the future
-//        web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [121], id: 0})
-//        web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", params: [], id: 0})
-//        assert.ok(await icoSCM.claim())
-//        assert.equal(await tokenSCM.balanceOf.call(accounts[0]), expectedTokens)
-//        assert.equal(await icoSCM.balances.call(accounts[0]), 0)
     });
 });
