@@ -92,6 +92,7 @@ contract('CustomCrowdsale', (accounts) => {
             var myTokenInstance = await myToken.deployed();
             var myWethInstance = await myWeth.deployed();
 
+            //var value = new web3.utils.BN(web3.utils.toWei("1", 'ether'));
             var investorOne = accounts[1];
             var investorTwo = accounts[2];
             var investorThree = accounts[3];
@@ -117,10 +118,36 @@ contract('CustomCrowdsale', (accounts) => {
             //await myWethInstance.approve(investorOne, ether('1')});
             //console.log(isApproved.valueOf());
 
-            // var isCompleted =  await myCustomCrowdsaleInstance.isCompleted();
+            var isCompleted =  await myCustomCrowdsaleInstance.isCompleted();
+            assert.equal(isCompleted.valueOf(), expected_isCompleted, 'CustomCrowdsale Contract Should have a hasClosed of false');
+            console.log('Crowdsale Closed? ' + isCompleted.valueOf());
+
+
+            //await myCustomCrowdsaleInstance.buyToken(web3.utils.toWei('0.5'));
+            //await myCustomCrowdsaleInstance.claimContributions();
+
+
+            var startingTime = (await myCustomCrowdsaleInstance.getStartingTime()).toNumber();
+            console.log('is Crowdsale Starting Time: ' + startingTime);
+
+            var actualTime = await time.latest();
+            console.log('Crowdsale Current Time: ' + actualTime.toNumber());
+
+            var newTime = startingTime + duration.minutes(3);
+            console.log('Crowdsale Release Time: ' + newTime);
+
+            await time.increaseTo(newTime);
+
+            // Closing The Auction
+            await myCustomCrowdsaleInstance.closeICO();
+
+            var isCompleted =  await myCustomCrowdsaleInstance.isCompleted();
+            console.log('is Crowdsale Closed? ' + isCompleted.valueOf());
+
+            // var expected_isCompleted = true;
             // assert.equal(isCompleted.valueOf(), expected_isCompleted, 'CustomCrowdsale Contract Should have a hasClosed of false');
 
-            //await myCustomCrowdsaleInstance.buyToken(1);
+
 
         } catch(error) {
             console.log(error);

@@ -34,6 +34,7 @@ contract CustomCrowdsale is Ownable {
     // Setting Up Modifiers for the Finalize Function
     modifier whenICOCompleted {
         require(ICOCompleted, 'Token ICO not Completed!!');
+        require(closingTime > 0 && (closingTime + 2 minutes) < now, "Ico not closed");
         _;
     }
 
@@ -57,12 +58,10 @@ contract CustomCrowdsale is Ownable {
 
     // Buy Funtion for the Custom Crowdsale
     function buyToken(uint256 _contribution) public returns (bool){
-        //require (_contribution >= 0);
         if (_contribution + currentContribution >= contributionGoal) {
             _contribution = contributionGoal.sub(currentContribution);
             require(_contribution >= 0, 'There is no more tokens');
-            closeICO();
-            emit CloseCrowdsale(msg.sender, now);
+
         }
 
         require(weth9.transfer(address(this), _contribution), "Unable to transfer");
@@ -74,16 +73,16 @@ contract CustomCrowdsale is Ownable {
 
     function closeICO() public onlyOwner returns (bool) {
         ICOCompleted = true;
+        emit CloseCrowdsale(msg.sender, now);
         return true;
     }
 
     function claimContribution() public whenICOCompleted returns (bool) {
-        //require(closedOn > 0 && (closedOn + 2 minutes) < now, "Ico not closed");
         uint currentTokens = contributions[msg.sender] * rate;
 
         if (currentTokens > 0) {
             token.transfer(msg.sender, currentTokens);
-            delete contributions[msg.sender];
+            contributions[msg.sender] = 0;
             emit ClaimContribution(msg.sender, currentTokens);
         }
         return true;
@@ -109,7 +108,7 @@ contract CustomCrowdsale is Ownable {
         return currentContribution;
     }
 
-    function getStarting() public view returns (uint256) {
+    function getStartingTime() public view returns (uint256) {
         return staringTime;
     }
 

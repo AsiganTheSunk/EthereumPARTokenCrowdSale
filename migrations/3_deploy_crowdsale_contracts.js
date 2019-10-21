@@ -42,6 +42,7 @@ module.exports = async function(deployer, accounts, [owner]) {
 
         // Transfer CustomTokens To the Crowdsale Contract
         await myCustomTokenInstance.transferOwnership(myCustomCrowdSale.address);
+        //await myCustomTokenInstance.transfer(myCustomCrowdSale.address, totalSupply);
     });
 };
 
