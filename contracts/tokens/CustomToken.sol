@@ -55,7 +55,7 @@ contract CustomToken is ERC20Detailed, Ownable {
     }
 
     function transferFrom(address src, address dst, uint _amount) public returns (bool) {
-        require(balanceOf[src] >= _amount);
+        require(balanceOf[src] >= _amount,'');
         if (src != msg.sender && allowance[src][msg.sender] != uint(-1)) {
             require(allowance[src][msg.sender] >= _amount, 'not enough Allowance ');
             allowance[src][msg.sender] = allowance[src][msg.sender].add(_amount);

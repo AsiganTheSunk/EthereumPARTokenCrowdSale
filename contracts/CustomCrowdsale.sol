@@ -4,8 +4,6 @@ pragma solidity >=0.5.0 <0.6.0;
 import "./tokens/CustomToken.sol";
 import "canonical-weth/contracts/WETH9.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol";
 
 contract CustomCrowdsale is Ownable {
     using SafeMath for uint256;
@@ -37,7 +35,7 @@ contract CustomCrowdsale is Ownable {
     // Setting Up Modifiers for the Finalize Function
     modifier whenICOCompleted {
         require(ICOCompleted, 'Token ICO not Completed!!');
-        require(closingTime > 0 && (closingTime + 2 minutes) < now, "Ico not closed");
+        require(closingTime > 0 && (closingTime + 2 minutes) < now, 'Ico not closed');
         _;
     }
 
@@ -49,26 +47,26 @@ contract CustomCrowdsale is Ownable {
         rate = _rate;
         cap = _cap;
         contributionGoal = _contributionGoal;
-        token = CustomToken(address(uint160(_tokenAddr)));
-        weth9 = WETH9(_wethAddr);
+        token = CustomToken(_tokenAddr);        // Default fallback function not needed != address payable
+        weth9 = WETH9(_wethAddr);               // Default fallback function deposit() 
 
-        require(startingTime >= block.timestamp, "Opening time is before current time");
-        require(closingTime > startingTime, "Opening time is not before closing time");
+        require(startingTime >= now, 'Opening time is before current time');
+        require(closingTime > startingTime, 'Opening time is not before closing time');
         require(cap > 0, 'Cap value must be more than 0');
         require(contributionGoal > 0, 'Goal value must be more than 0');
         require(contributionGoal > cap, 'Goal value must be more than Cap value');
     }
 
     // Buy Funtion for the Custom Crowdsale
-    function buyToken(uint256 _contribution) public returns (bool){
+    function buyToken(uint256 _contribution) public returns (bool) {
         if (_contribution + currentContribution >= contributionGoal) {
             _contribution = contributionGoal.sub(currentContribution);
             require(_contribution >= 0, 'There is no more tokens');
         }
-        require(weth9.transfer(address(this), _contribution), "Unable to transfer");
-//        currentContribution = currentContribution.add(_contribution);
-//        contributions[msg.sender] += contributions[msg.sender].add(_contribution);
-//        emit Contribution(msg.sender, _contribution);
+        require(weth9.transferFrom(msg.sender, address(this), _contribution), "Unable to transfer");
+        currentContribution = currentContribution.add(_contribution);
+        contributions[msg.sender] = contributions[msg.sender].add(_contribution);
+        emit Contribution(msg.sender, _contribution);
         return true;
     }
 
@@ -78,11 +76,11 @@ contract CustomCrowdsale is Ownable {
         return true;
     }
 
-    function claimContribution() public whenICOCompleted returns (bool) {
-        uint currentTokens = contributions[msg.sender] * rate;
+    function claimContribution() public returns (bool) {
+        uint256 currentTokens = contributions[msg.sender] * rate;
 
         if (currentTokens > 0) {
-            token.transfer(msg.sender, currentTokens);
+            require(token.transferFrom(address(token), msg.sender, currentTokens), "Unable to transfer");
             contributions[msg.sender] = 0;
             emit ClaimContribution(msg.sender, currentTokens);
         }
@@ -92,10 +90,6 @@ contract CustomCrowdsale is Ownable {
     function getWethTotalSupply() public view returns (uint256) {
         return weth9.totalSupply();
     }
-
-//    function getWethTotalAllowance(address wethContract) public view returns (uint256) {
-//        return weth9.allowance[msg.sender][wethContract];
-//    }
 
     function getRate() public view returns (uint256) {
         return rate;
