@@ -30,9 +30,9 @@ module.exports = async function(deployer, accounts, [owner]) {
 
     // Default Time Constraints for the CustomCrowdsale Contract
     var latestTime      = (new Date).getTime();
-    var startingTime    = latestTime + duration.minutes(1);
-    var closingTime     = startingTime + duration.minutes(5);
-    var releaseTime     = closingTime + duration.minutes(2);
+    var startingTime    = (new Date).setTime(latestTime + (60 * 1000));
+    var closingTime     = (new Date).setTime(startingTime + (60 * 5 * 1000));
+    var releaseTime     = (new Date).setTime(closingTime + (60 * 2 * 1000));
 
     deployer.deploy(myCustomCrowdSale, rate, cap, goal, myWETH9.address, myCustomToken.address,
                     startingTime, closingTime, releaseTime).then(async () => {

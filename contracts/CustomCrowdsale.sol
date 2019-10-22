@@ -12,13 +12,16 @@ contract CustomCrowdsale is Ownable {
 
     // Attr of the Custom Crowdsale
     WETH9 public weth9;
-    ERC20Detailed public token;
+    CustomToken public token;
     uint256 public rate = 2;
     uint256 public cap = 10 ether;
     bool public ICOCompleted = false;
     uint256 public contributionGoal = 50 ether;
     uint256 public currentContribution = 0 ether;
-    uint256 public staringTime;
+
+    //address public onwer = this.owner();
+    // uxio dice que staring u
+    uint256 public startingTime;
     uint256 public closingTime;
     uint256 public releaseTime;
     uint256 public numberOfContributions;
@@ -39,18 +42,18 @@ contract CustomCrowdsale is Ownable {
     }
 
     // Constructor for the CustomCrowdsale
-    constructor(uint256 _rate, uint256 _cap, uint256 _contributionGoal, address _wethAddr, address _tokenAddr, uint256 _staringTime, uint256 _closingTime, uint256 _releaseTime) public {
+    constructor(uint256 _rate, uint256 _cap, uint256 _contributionGoal, address payable _wethAddr, address _tokenAddr, uint256 _staringTime, uint256 _closingTime, uint256 _releaseTime) public {
         closingTime = _closingTime;
-        staringTime = _staringTime;
+        startingTime = _staringTime;
         releaseTime = _releaseTime;
         rate = _rate;
         cap = _cap;
         contributionGoal = _contributionGoal;
         token = CustomToken(address(uint160(_tokenAddr)));
-        weth9 = WETH9(address(uint160(_wethAddr)));
+        weth9 = WETH9(_wethAddr);
 
-        require(staringTime >= block.timestamp, "Opening time is before current time");
-        require(closingTime > staringTime, "Opening time is not before closing time");
+        require(startingTime >= block.timestamp, "Opening time is before current time");
+        require(closingTime > startingTime, "Opening time is not before closing time");
         require(cap > 0, 'Cap value must be more than 0');
         require(contributionGoal > 0, 'Goal value must be more than 0');
         require(contributionGoal > cap, 'Goal value must be more than Cap value');
@@ -63,9 +66,9 @@ contract CustomCrowdsale is Ownable {
             require(_contribution >= 0, 'There is no more tokens');
         }
         require(weth9.transfer(address(this), _contribution), "Unable to transfer");
-        currentContribution = currentContribution.add(_contribution);
-        contributions[msg.sender] += contributions[msg.sender].add(_contribution);
-        emit Contribution(msg.sender, _contribution);
+//        currentContribution = currentContribution.add(_contribution);
+//        contributions[msg.sender] += contributions[msg.sender].add(_contribution);
+//        emit Contribution(msg.sender, _contribution);
         return true;
     }
 
@@ -85,6 +88,14 @@ contract CustomCrowdsale is Ownable {
         }
         return true;
     }
+
+    function getWethTotalSupply() public view returns (uint256) {
+        return weth9.totalSupply();
+    }
+
+//    function getWethTotalAllowance(address wethContract) public view returns (uint256) {
+//        return weth9.allowance[msg.sender][wethContract];
+//    }
 
     function getRate() public view returns (uint256) {
         return rate;
@@ -107,7 +118,7 @@ contract CustomCrowdsale is Ownable {
     }
 
     function getStartingTime() public view returns (uint256) {
-        return staringTime;
+        return startingTime;
     }
 
     function getClosingTime() public view returns (uint256) {
