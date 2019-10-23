@@ -8,18 +8,6 @@ var myConvertLib = artifacts.require("./ConvertLib.sol");
 var myWETH9 = artifacts.require("canonical-weth/contracts/WETH9.sol");
 var myCustomToken = artifacts.require("./CustomToken.sol");
 
-
-//var ether = (n) => new web3.BigNumber(web3.toWei(n, 'ether'));
-
-const duration = {
-  seconds:  function (val) { return val; },
-  minutes:  function (val) { return val * this.seconds(60); },
-  hours:    function (val) { return val * this.minutes(60); },
-  days:     function (val) { return val * this.hours(24); },
-  weeks:    function (val) { return val * this.days(7); },
-  years:    function (val) { return val * this.days(365); },
-};
-
 module.exports = async function(deployer, accounts, [owner]) {
     // Deployment Variables for the CustomCrowdsale Contract
 
@@ -42,7 +30,7 @@ module.exports = async function(deployer, accounts, [owner]) {
 
         // Transfer CustomTokens To the Crowdsale Contract
         await myCustomTokenInstance.transferOwnership(myCustomCrowdSale.address);
-        //await myCustomTokenInstance.transfer(myCustomCrowdSale.address, totalSupply);
+        await myCustomTokenInstance.transfer(myCustomCrowdSale.address, totalSupply);
     });
 };
 
