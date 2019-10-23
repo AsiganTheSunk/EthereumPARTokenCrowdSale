@@ -76,11 +76,12 @@ contract('CustomCrowdsale', (accounts) => {
     it('[ Tx ]: Contract should have a Default remainingTokens of * ', async () => {
         try {
 
-
-            var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
+            // Deploy the Smart Contracts, and await via Promise.all()
             var myTokenInstance = await myToken.deployed();
             var myWethInstance = await myWeth.deployed();
-            Promise.all([myTokenInstance, myWethInstance, myCustomCrowdsaleInstance])
+            var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
+
+            Promise.all([myTokenInstance, myWethInstance, myCustomCrowdsaleInstance]);
 
             // //var value = new web3.utils.BN(web3.utils.toWei("1", 'ether'));
             // var investorOne = accounts[1];
@@ -92,7 +93,6 @@ contract('CustomCrowdsale', (accounts) => {
             // var goal = (await myCustomCrowdsaleInstance.getGoal()).toNumber();
             // var rate = (await myCustomCrowdsaleInstance.getRate()).toNumber();
 
-            //var totalAllowedInvestment = goal - ether('1')
             await myWethInstance.deposit({'value': ether('3')});
             var depositedWeth = new BN(await myWethInstance.totalSupply());
             console.log('       +  Current Deposit of WETH in WETH9 Contract: ' + String(depositedWeth));
@@ -128,29 +128,29 @@ contract('CustomCrowdsale', (accounts) => {
             // actualTime = await time.latest();
             // console.log('       +  Crowdsale Current Time:  ' + actualTime.toNumber());
 
-            // Current Auction State
-            // var expected_isCompleted = false;
+            // Current Auction State **** ULTIMO DESCOMENTADO
+            // //const expected_isCompleted = false;
             // var isCompleted =  await myCustomCrowdsaleInstance.isCompleted();
             // console.log('       +  isCrowdsale Closed? ' + isCompleted.valueOf());
-            // assert.equal(isCompleted.valueOf(), expected_isCompleted, 'CustomCrowdsale Contract Should have a hasClosed of true');
+            // assert.equal(isCompleted.valueOf(), true, 'CustomCrowdsale Contract Should have a hasClosed of true');
 
             const currentTokenToBuy = new BN(web3.utils.toWei('3')); 
             await myCustomCrowdsaleInstance.buyToken(currentTokenToBuy);
             var currentWethBalance = new BN((await myCustomCrowdsaleInstance.getWethTotalSupply()));
             console.log('       +  Current Allowance of WETH9 in Crodwsale Contract: ' + String(currentWethBalance));
 
-            // // Closing The Auction
-            // await myCustomCrowdsaleInstance.closeICO();
-            // var isCompleted =  await myCustomCrowdsaleInstance.isCompleted();
-            // console.log('       +  isCrowdsale Closed? ' + isCompleted.valueOf());
-            // var expected_isCompleted = true;
-            // assert.equal(isCompleted.valueOf(), expected_isCompleted, 'CustomCrowdsale Contract Should have a hasClosed of false');
-            // console.log('       +  Crowdsale Closed? ' + isCompleted.valueOf());
+            // Closing The Auction
+            await myCustomCrowdsaleInstance.closeICO();
+            const valueIsCompleted =  await myCustomCrowdsaleInstance.isCompleted();
+            console.log('       +  isCrowdsale Closed? ' + valueIsCompleted.valueOf());
+            const expectedIsCompleted = true;
+            assert.equal(valueIsCompleted.valueOf(), expectedIsCompleted, 'CustomCrowdsale Contract Should have a hasClosed of false');
+            console.log('       +  Crowdsale Closed? ' + valueIsCompleted.valueOf());
  
-            const currentTokenInCrowdsale = await myTokenInstance.getBalance(myCustomCrowdsaleInstance.address);
-            console.log('       +  Current Tokens in Crowdsale '+ String(currentTokenInCrowdsale));
-            await myTokenInstance.approve(myCustomCrowdsale.address, currentTokenToBuy);
-            await myCustomCrowdsaleInstance.claimContribution();
+            // const currentTokenInCrowdsale = await myTokenInstance.getBalance(myCustomCrowdsaleInstance.address);
+            // console.log('       +  Current Tokens in Crowdsale '+ String(currentTokenInCrowdsale));
+            // await myTokenInstance.approve(myCustomCrowdsale.address, currentTokenToBuy);
+            // await myCustomCrowdsaleInstance.claimContribution();
 
         } catch(error) {
             console.log(error);
