@@ -74,7 +74,7 @@ contract CustomCrowdsale is Ownable {
         aux.add(_contribution);
         aux.add(currentContribution);
         if (aux > contributionGoal) {
-            _contribution.push(contributionGoal.sub(currentContribution));
+            _contribution = contributionGoal.sub(currentContribution);
         }
         require(weth9.transferFrom(msg.sender, address(this), _contribution), "Unable to transfer");
         currentContribution = currentContribution.add(_contribution);
