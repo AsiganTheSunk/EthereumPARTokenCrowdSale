@@ -1,9 +1,6 @@
 // Deployment Artifact for the Custom Crowdsale Contract
 var myCustomCrowdSale = artifacts.require("./CustomCrowdsale.sol");
 
-// Deployment Artifact for the ConvertLib Linked Library
-var myConvertLib = artifacts.require("./ConvertLib.sol");
-
 // Deployment Artifacts for the CustomToken, WETH9 & SafeWETH9 Contracts
 var myWETH9 = artifacts.require("canonical-weth/contracts/WETH9.sol");
 var myCustomToken = artifacts.require("./CustomToken.sol");

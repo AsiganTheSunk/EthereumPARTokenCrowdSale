@@ -86,7 +86,7 @@ contract('WETH9', (accounts) => {
              // Make A Deposit of a Positive Value.
             await myWeth9Instance.deposit({'value': amount});
             var currentBalance = new BN(await myWeth9Instance.totalSupply());
-            console.log('        + Current Supply WETH: ' +  String(currentBalance));
+            //console.log('        + Current Supply WETH: ' +  String(currentBalance));
 
         } catch (error) {
             assert.equal(error.message, 'Returned error: VM Exception while processing transaction: revert', "This Contract is vulnerable to UnderFlow Attacks");

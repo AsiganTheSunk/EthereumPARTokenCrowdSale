@@ -5,11 +5,9 @@ pragma solidity >=0.5.0 <0.6.0;
  * @title Imports
  * Import ERC20Detailed Module from OpenZeppelin Library
  * Import SafeMath Module from OpenZeppelin Library
- * Import Convert Library Contract from ./ConvertLib.sol
  */
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../lib/ConvertLib.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
@@ -66,10 +64,6 @@ contract CustomToken is ERC20Detailed, Ownable {
 
         emit Transfer(src, dst, _amount);
         return true;
-    }
-
-    function getBalanceInEth(address addr) public view returns(uint){
-        return ConvertLib.convert(getBalance(addr), 100);
     }
 
     function getBalance(address addr) public view returns(uint) {
