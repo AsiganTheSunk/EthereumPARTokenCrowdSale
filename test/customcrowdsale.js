@@ -98,6 +98,59 @@ contract('CustomCrowdsale', (accounts) => {
 
             // Wait for all the Deployements to be over
             Promise.all([myTokenInstance, myWethInstance, myCustomCrowdsaleInstance]);
+
+            /**
+              * Make a deposit in the WETH9 Contract
+              */
+            // await myWethInstance.deposit({'value': ether('10')});
+            // Retrieve the deposit made previously
+            // // var depositedWeth = new BN(await myWethInstance.totalSupply());
+            // Expected value to be Retrieved  with the totalSuppy() function
+            // var expectedWeth9 = new BN(ether('10'));
+            // // console.log('       +  Current Deposit of WETH in WETH9 Contract: ' + String(depositedWeth));
+            // Assertion for the Current deposit vs Expected deposit of WETH9
+            // assert.equal(String(depositedWeth), String(expectedWeth9), 'myWethInstance Contract Should have x ether as currentWethBalance');
+
+            /**
+              * Make a approval operation in the current CustomCrowsale Contract of the previous amount of WETH9
+              */
+            // await myWethInstance.approve(myCustomCrowdsale.address, depositedWeth);
+            // Retrieve the Current Balance of WETH9 in the CustomCrowdsale
+            // var currentWethBalance = new BN((await myCustomCrowdsaleInstance.getWethTotalSupply()));
+            // Assertion for the Current Balance vs Expected deposit of WETH9
+            // assert.equal(String(currentWethBalance), String(expectedWeth9), 'myWethInstance Contract Should have x ether as currentWethBalance');
+
+            /**
+              * Check Current state of the CustomCrowdsale (Open)
+              */
+            // Retrieve the Current state of the Crowdsale
+            // var isCompleted =  await myCustomCrowdsaleInstance.isCompleted();
+            // Assertion of the Current state vs Expected stateof the CustomCrowdsale
+            // assert.equal(isCompleted.valueOf(), false, 'CustomCrowdsale Contract Should have a hasClosed of false');
+
+            /**
+              * Perform a buy in the CustomCrowdsale
+              */
+            // Current Buyer
+            // var account0 = accounts[0];
+            // Current Amount of CustomToken to buy in the CustomCrowdsale by the current buyer
+            // var currentTokenToBuy = 5;
+            // Perform a buy of the previous defined amount
+            // await myCustomCrowdsaleInstance.buyToken(currentTokenToBuy, {from:account0});
+
+            /**
+              * Simulate the closing to the CustomCrowdsale
+              */
+            // Perform the closing of the CustomCrowdsale
+            // await myCustomCrowdsaleInstance.closeICO();
+
+            /**
+              * Perform the claim from the buyer on the owned tokens
+              */
+            // Aprove the current transfer of the amount that has been bought
+            // await myTokenInstance.approve(myCustomCrowdsaleInstance.address, currentTokenToBuy);
+            // Perform the claim for the CustomTokens
+            // await myCustomCrowdsaleInstance.claimContribution({from:account0});
         } catch(err) {
             console.log(err);
         }
