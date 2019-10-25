@@ -41,7 +41,7 @@ contract('WETH9', (accounts) => {
         assert.equal(decimals.valueOf(), expected_decimals, 'SafeWETH9 Contract does not comply with the Expected Decimal Value.');
     });
 
-    it('[ Tx ]: Contract should be able to Reject Negative deposit()', async () => {
+    it('[  Tx  ]: Contract should be able to Reject Negative deposit()', async () => {
         try {
             // Default Values.
             var myWeth9Instance = await myWeth.deployed();
@@ -55,7 +55,7 @@ contract('WETH9', (accounts) => {
         }
     });
 
-    it('[ Tx ]: Contract should be able to Reject withdraw() for more tokens than the balance deposited', async () => {
+    it('[  Tx  ]: Contract should be able to Reject withdraw() for more tokens than the balance deposited', async () => {
         try {
             // Default Values.
             var accountOne = accounts[0];
@@ -75,7 +75,7 @@ contract('WETH9', (accounts) => {
         }
     });
 
-    it('[ Tx ]: Contract should be able to make a deposit and check it', async () => {
+    it('[  Tx  ]: Contract should be able to make a deposit and check it', async () => {
         try {
             // Default Values.
             var accountOne = accounts[0];

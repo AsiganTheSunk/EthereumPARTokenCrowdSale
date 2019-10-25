@@ -32,7 +32,7 @@ contract('CustomToken', (accounts) => {
      */
     it('[ Init ]: Contract should have a Default Name of Custom Token Currency', async () => {
         try {
-            // Finish the deployment of the CustomToken Contract instance.
+            // Await Deployment of the Smart Contract
             var myCustomTokenInstance = await myToken.deployed();
             // Promise(myCustomTokenInstance);
             
@@ -54,15 +54,15 @@ contract('CustomToken', (accounts) => {
      */
     it('[ Init ]: Contract should have a Default Symbol of CTC', async () => {
         try {
-            // Finish the deployment of the CustomToken Contract instance.
+            // Await Deployment of the Smart Contract
             var myCustomTokenInstance = await myToken.deployed();
-            // Promise(myCustomTokenInstance);
 
-            // Default Values
+            // Expected value for symbol in CustomToken
+            var expectedSymbol = 'CTC';
+
+            // Retrieve current value for the symbol in CustomToken
             var currentSymbol = await myCustomTokenInstance.symbol();
 
-            // Expected Return Values
-            var expectedSymbol = 'CTC';                      
             assert.equal(currentSymbol.valueOf(), expectedSymbol, 'Token Contract does not comply with the Expected Symbol Value.');
         } catch(err) {
             console.log(err.message)
@@ -75,14 +75,13 @@ contract('CustomToken', (accounts) => {
      */
     it('[ Init ]: Contract should have a Default Decimal of 18', async () => {
         try {
-            // Finish the deployment of the CustomToken Contract instance.
+            // Await Deployment of the Smart Contract
             var myCustomTokenInstance = await myToken.deployed();
-            // Promise(myCustomTokenInstance)
 
-            // Default Values
+            // Retrieve current value for the decimals in CustomToken
             var currentDecimals = await myCustomTokenInstance.decimals();
 
-            // Expected Return Values
+            // Expected value for decimals in CustomToken
             var expectedDecimals = 18;
 
             assert.equal(currentDecimals.valueOf(), expectedDecimals, 'Token Concract does not comply with the Expected Decimal Value.');
@@ -91,12 +90,14 @@ contract('CustomToken', (accounts) => {
         }
     });
 
-    it('[ Tx ]: Contract should be able to Reject OverFlow on transfer()', async () => {
+    it('[  Tx  ]: Contract should be able to Reject OverFlow on transfer()', async () => {
         try {
+            // Await Deployment of the Smart Contract
+            var myCustomTokenInstance = await myToken.deployed();
+
             // Default Values.
             var accountOne = accounts[0];
             var accountTwo = accounts[1];
-            var myCustomTokenInstance = await myToken.deployed();
 
             // Get initial balances from accountOne and accountTwo.
             var accountOneStartingBalance = (await myCustomTokenInstance.getBalance.call(accountOne)).toNumber();
@@ -111,12 +112,15 @@ contract('CustomToken', (accounts) => {
             }
     });
 
-    it('[ Tx ]: Contract should be able to Reject UnderFlow on transfer() using SafeMath', async () => {
+    it('[  Tx  ]: Contract should be able to Reject UnderFlow on transfer() using SafeMath', async () => {
         try {
+
+            var myCustomTokenInstance = await myToken.deployed();
+
             // Default Values.
             var accountOne = accounts[0];
             var accountTwo = accounts[1];
-            var myCustomTokenInstance = await myToken.deployed();
+
 
             // Get initial balances from accountOne and accountTwo.
             var accountOneStartingBalance = (await myCustomTokenInstance.getBalance.call(accountOne)).toNumber();
