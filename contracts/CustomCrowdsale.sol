@@ -4,6 +4,7 @@ pragma solidity >=0.5.0 <0.6.0;
 import "./tokens/CustomToken.sol";
 import "canonical-weth/contracts/WETH9.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/crowdsale/Crowdsale.sol";
 
 contract CustomCrowdsale is Ownable {
     using SafeMath for uint256;
@@ -25,6 +26,7 @@ contract CustomCrowdsale is Ownable {
 
     // Current Of the Crowdsale
     bool public ICOCompleted = false;
+    bool public ICOGoalReached = false;
 
     // Mapping of the Contributions
     mapping (address => uint256) public contributions;
@@ -34,6 +36,9 @@ contract CustomCrowdsale is Ownable {
     event ClaimContribution(address _from, uint256 _amount);
     event CloseCrowdsale(address _from, uint256 time);
     event claimContributionPreTx(address _sender, uint256 _claimedTokens, uint256 _balance);
+
+    //event claimContributionPostTx();
+    //event openCrowdsale();
 
     // Setting Up Modifiers for the Finalize Function
     modifier whenICOCompleted {
@@ -48,35 +53,49 @@ contract CustomCrowdsale is Ownable {
         return true;
     }
 
+    // NOTE: Only address playable needs a fallback function
     constructor(uint256 _rate, uint256 _cap, uint256 _contributionGoal, address payable _wethAddr, address _tokenAddr, uint256 _staringTime, uint256 _closingTime, uint256 _releaseTime) public {
         rate = _rate;
         cap = _cap;
         contributionGoal = _contributionGoal;
-        weth9 = WETH9(_wethAddr); // Default fallback function deposit()
-        token = CustomToken(_tokenAddr); // Default fallback function not needed != address payable
+        weth9 = WETH9(_wethAddr);
+        token = CustomToken(_tokenAddr);
         startingTime = _staringTime;
         closingTime = _closingTime;
         releaseTime = _releaseTime;
 
-        // Current Contraints for the Constructor of the Crowdsale.
+        /**
+          * Current Contraints for the Constructor of the Crowdsale
+          */
+        // Requirement startingTime must be after than Now in the CustomCrowdsale
         require(startingTime > now, 'StaringTime before Now');
+        // Requirement closingTime must be after startingTime in the CustomCrowdsale
         require(closingTime > startingTime, 'StaringTime time after ClosingTime');
+        // Requirement for the Cap constraint for the CustomCrowdsale
         require(cap > 0, 'Cap Value must be above 0');
+        // Requirement contributionGoal must be higher than 0 in CustomCrowdsale
         require(contributionGoal > 0, 'Goal Value must be above 0');
+        // Requirement contributionGoal must be higher than the Cap in the CustomCrowdsale
         require(contributionGoal > cap, 'Goal value must be above cap Value');
     }
 
     // Buy Funtion for the Custom Crowdsale
     function buyToken(uint256 _contribution) public returns (bool) {
-        // Case: Request More than the actual amount.
+        // Requirement contribution must be less than the Cap in the CustomCrowdsale
+        require(_contribution < cap, 'CustomCrowdsaled buyToken() has exceed the cap');
+        // Requirement currentContribution must be less than the contributionGoal in the CustomCrowdsale
         require(currentContribution < contributionGoal, 'CustomCrowdsale has succeed in the pursue of the contributionGoal');
+        // Requirement contribution must be higher than 0 in the CustomCrowdsale
         require(_contribution >= 0,'contribution parameter must be above 0');
+
         uint256 aux = 0;
         aux.add(_contribution);
         aux.add(currentContribution);
+        // If the current buy does not exceed the cap but overreaches the actual contributionGoal, the tokens left would be sold instead
         if (aux > contributionGoal) {
             _contribution = contributionGoal.sub(currentContribution);
         }
+        // Requirement transferForm must be successful in the CustomCrowdsale
         require(weth9.transferFrom(msg.sender, address(this), _contribution), "transferFrom() Wether has Failed");
         currentContribution = currentContribution.add(_contribution);
         contributions[msg.sender] = contributions[msg.sender].add(_contribution);
@@ -85,7 +104,7 @@ contract CustomCrowdsale is Ownable {
     }
 
 
-    function claimContribution() public returns (bool) {
+    function claimContribution() public whenICOCompleted returns (bool) {
         uint256 claimedTokens = contributions[msg.sender].mul(rate);
 
         emit claimContributionPreTx(msg.sender, claimedTokens, contributions[msg.sender]);
