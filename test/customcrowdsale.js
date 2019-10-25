@@ -42,14 +42,28 @@ contract('CustomCrowdsale', (accounts) => {
     });
 
     it('[ Tx ]: Contract should have a Default remainingTokens of * ', async () => {
-        try {
 
+
+        try {
             // Deploy the Smart Contracts, and await via Promise.all()
             var myTokenInstance = await myToken.deployed();
             var myWethInstance = await myWeth.deployed();
             var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
             Promise.all([myTokenInstance, myWethInstance, myCustomCrowdsaleInstance]);
-
+        
+            // Or pass a callback to start watching immediately
+            myCustomCrowdsaleInstance.allEvents({
+                fromBlock: 0
+              }, (err, event) => {
+                console.log(err, event)
+              }).on('data', function(event){
+                console.log(event); // same results as the optional callback above
+            })
+            .on('changed', function(event){
+                console.log(event)
+                // remove event from local database
+            })
+            .on('error', console.error);
 
             await myWethInstance.deposit({'value': ether('3')});
             var depositedWeth = new BN(await myWethInstance.totalSupply());
@@ -70,7 +84,7 @@ contract('CustomCrowdsale', (accounts) => {
 
             //var currentTokenToBuy = new BN(web3.utils.toWei('3')); 
             currentTokenToBuy = 5;
-            await myCustomCrowdsaleInstance.buyToken(currentTokenToBuy);
+            await myCustomCrowdsaleInstance.buyToken(currentTokenToBuy, {from:accounts[0]});
 
             // Evaluating Status of Custom Crowdsale (Close)
             await myCustomCrowdsaleInstance.closeICO();
@@ -82,19 +96,26 @@ contract('CustomCrowdsale', (accounts) => {
             
 
             await myTokenInstance.approve(myCustomCrowdsaleInstance.address, currentTokenToBuy);
-            await myCustomCrowdsaleInstance.claimContribution();
+            await myCustomCrowdsaleInstance.claimContribution({from:accounts[0]});
  
             var currentContribution  = await myCustomCrowdsaleInstance.getCurrentContribution();
             console.log('       +  CurrentContribution in Crowdsale '+ String(currentContribution));
 
+            
+            var account0 = accounts[0];
+            var balance_account1 = await myTokenInstance.getBalance(account0);
+            console.log('       +  Current Tokens in Account0 ' + balance_account1.toNumber());
 
-            var account1 = accounts[0];
-            var balance_account1 = await myTokenInstance.getBalance(account1);
-            console.log('       +  Current Tokens in Account 0 ' + balance_account1.toNumber());
 
+            // let events = myCustomCrowdsaleInstance.allEvents({fromBlock: 0, toBlock: 'latest'});
+            // console.log(events);
 
+            myCustomCrowdsaleInstance.getPastEvents({fromBlock: 0, toBlock: 'latest'}, function(error, events){ console.log(events); })
+            .then(function(events){
+                console.log(events) // same results as the optional callback above
+            });
         } catch(error) {
             console.log(error);
         }
     });
-});
+});   
