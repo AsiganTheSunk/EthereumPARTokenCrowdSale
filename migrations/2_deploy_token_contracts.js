@@ -7,7 +7,7 @@ var myToken = artifacts.require("./CustomToken.sol");
 // Deployment
 module.exports = function(deployer) {
     // Deployment Default Variables for CustomToken Contract
-    var token_quantity = ether('100');
+    var token_quantity = 1000;
 
     // Artifact Deployment for Custom Contract
     deployer.deploy(myToken, token_quantity);

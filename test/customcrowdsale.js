@@ -41,17 +41,6 @@ contract('CustomCrowdsale', (accounts) => {
         assert.equal(goal.toNumber(), expected_goal, 'CustomCrowdsale Contract Should have a Goal of 100');
     });
 
-
-    // it('[ Init ]: Contract should have a Default currentContribution of 0', async () => {
-    //     var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
-
-    //     // Expected Value for Contract
-    //     var expected_currentContribution = 0;
-
-    //     var currentContribution  = await myCustomCrowdsaleInstance.getCurrentContribution();
-    //     assert.equal(currentContribution.toNumber(), expected_currentContribution, 'CustomCrowdsale Contract Should have a currentContribution of 0');
-    // });
-
     it('[ Tx ]: Contract should have a Default remainingTokens of * ', async () => {
         try {
 
@@ -91,7 +80,7 @@ contract('CustomCrowdsale', (accounts) => {
             console.log('       +  Current Tokens in Crowdsale '+ String(currentTokenInCrowdsale));
             var currentRate = myCustomCrowdsaleInstance.getRate();
 
-            await myTokenInstance.approve(myCustomCrowdsale.address, currentTokenToBuy);
+            await myTokenInstance.approve(myCustomCrowdsaleInstance.address, currentTokenToBuy);
             await myCustomCrowdsaleInstance.claimContribution();
  
             var currentContribution  = await myCustomCrowdsaleInstance.getCurrentContribution();

@@ -36,8 +36,8 @@ contract CustomCrowdsale is Ownable {
 
     // Setting Up Modifiers for the Finalize Function
     modifier whenICOCompleted {
-        require(ICOCompleted, 'Token ICO not Completed!!');
-        //require(closingTime > 0 && (closingTime + 2 minutes) < now, 'Ico not closed');
+        require(ICOCompleted, 'CustomCrowdsale Not Completed');
+        //require(closingTime > 0 && releaseTime < now, 'CustomCrowdsale releases the CustomTokens 2min afer');
         _;
     }
 
@@ -48,19 +48,19 @@ contract CustomCrowdsale is Ownable {
     }
 
     constructor(uint256 _rate, uint256 _cap, uint256 _contributionGoal, address payable _wethAddr, address _tokenAddr, uint256 _staringTime, uint256 _closingTime, uint256 _releaseTime) public {
-        closingTime = _closingTime;
-        startingTime = _staringTime;
-        releaseTime = _releaseTime;
         rate = _rate;
         cap = _cap;
         contributionGoal = _contributionGoal;
-        token = CustomToken(_tokenAddr); // Default fallback function not needed != address payable
         weth9 = WETH9(_wethAddr); // Default fallback function deposit()
-        
+        token = CustomToken(_tokenAddr); // Default fallback function not needed != address payable
+        startingTime = _staringTime;
+        closingTime = _closingTime;
+        releaseTime = _releaseTime;
+
         // Current Contraints for the Constructor of the Crowdsale.
-        require(startingTime > now, 'StaringTime before current time');
+        require(startingTime > now, 'StaringTime before Now');
         require(closingTime > startingTime, 'StaringTime time after ClosingTime');
-        require(cap > 0, 'Cap Value 0');
+        require(cap > 0, 'Cap Value must be above 0');
         require(contributionGoal > 0, 'Goal Value must be above 0');
         require(contributionGoal > cap, 'Goal value must be above cap Value');
     }
@@ -68,15 +68,15 @@ contract CustomCrowdsale is Ownable {
     // Buy Funtion for the Custom Crowdsale
     function buyToken(uint256 _contribution) public returns (bool) {
         // Case: Request More than the actual amount.
-        require(currentContribution < contributionGoal, 'the crowdsale has succeed in the pursue of money');
-        require(_contribution >= 0,'Contribution Must be Above 0');
+        require(currentContribution < contributionGoal, 'CustomCrowdsale has succeed in the pursue of the contributionGoal');
+        require(_contribution >= 0,'contribution parameter must be above 0');
         uint256 aux = 0;
         aux.add(_contribution);
         aux.add(currentContribution);
         if (aux > contributionGoal) {
             _contribution = contributionGoal.sub(currentContribution);
         }
-        require(weth9.transferFrom(msg.sender, address(this), _contribution), "Unable to transfer");
+        require(weth9.transferFrom(msg.sender, address(this), _contribution), "transferFrom() Wether has Failed");
         currentContribution = currentContribution.add(_contribution);
         contributions[msg.sender] = contributions[msg.sender].add(_contribution);
         emit Contribution(msg.sender, _contribution);
@@ -84,9 +84,10 @@ contract CustomCrowdsale is Ownable {
     }
 
     function claimContribution() public returns (bool) {
-        uint256 claimedTokens = contributions[msg.sender].mul(rate);
+        //uint256 claimedTokens = contributions[msg.sender].mul(rate);
+        uint256 claimedTokens = contributions[msg.sender];
         if(contributions[msg.sender] != 0 && token.totalSupply() > 0) {
-            require(token.transfer(msg.sender, claimedTokens), "Unable to transfer");
+            require(token.transfer(msg.sender, claimedTokens), "transfer() CustomTokens has Failed");
             contributions[msg.sender] = 0;
             delete contributions[msg.sender];
             emit ClaimContribution(msg.sender, claimedTokens);
