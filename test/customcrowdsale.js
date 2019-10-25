@@ -1,96 +1,123 @@
+/**
+ * Init() Section for the Deployed Contracts CustomToken, WETH9 & CustomCrowdsale
+ */
 const { balance, BN, time, ether, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 
-// Loading Smart Contracts CustomToken, WETH9 & CustomCrowdsale
-var myToken = artifacts.require("../contracts/tokens/CustomToken.sol");
 var myWeth = artifacts.require("canonical-weth/contracts/WETH9.sol");
+var myToken = artifacts.require("../contracts/tokens/CustomToken.sol");
 var myCustomCrowdsale = artifacts.require("../contracts/CustomCrowdsale.sol");
 
 contract('CustomCrowdsale', (accounts) => {
+
     /**
      * Evaluate if the current CustomCrowdsale has the correct rate for the defined Crowdsale
      */
     it('[ Init ]: Contract should have a Default Rate of 2', async () => {
-    	// Await Deployment
-        var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
+        try {
+        	// Await Deployment of the Smart Contract
+            var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
 
-        // Default Values
-        var expectedRate = 2;
+            // Expected value for rate in CustomCrowsale
+            var expectedRate = 2;
 
-        // Current Rate Value
-        var rate = await myCustomCrowdsaleInstance.getRate();
+            // Retrieve Current rate value in CustomCrowdsale Contract
+            var rate = await myCustomCrowdsaleInstance.getRate();
 
-        assert.equal(rate.toNumber(), expectedRate, 'CustomCrowdsale Contract Should have a Rate of 2');
+            assert.equal(rate.toNumber(), expectedRate, 'CustomCrowdsale Contract Should have a Rate of 2');
+        } catch(err) {
+            console.log(err);
+        }
     });
 
     /**
      * Evaluate if the current CustomCrowdsale has the correct cap for the defined Crowdsale
      */
     it('[ Init ]: Contract should have a Default Cap of 10', async () => {
-        // Await Deployment
-        var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
+        try {
+            // Await Deployment of the Smart Contract
+            var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
 
-        // Expected Value for Contract
-        var expected_cap = 10;
+            // Expected value for cap in CustomCrowsale
+            var expectedCap = 10;
 
-        // Current Cap Default Value for Contract
-        var cap = await myCustomCrowdsaleInstance.getCap();
+            // Retrieve Current cap value in CustomCrowdsale Contract
+            var cap = await myCustomCrowdsaleInstance.getCap();
 
-        assert.equal(cap.toNumber(), expected_cap, 'CustomCrowdsale Contract Should have a Cap of 100');
+            assert.equal(cap.toNumber(), expectedCap, 'CustomCrowdsale Contract Should have a Cap of 100');
+        } catch(err){
+            console.log(err);
+        }
     });
 
     /**
      * Evaluate if the current CustomCrowdsale has the correct goal for the defined Crowdsale
      */
     it('[ Init ]: Contract should have a Default Goal 50', async () => {
-    	// Await Deployment
-        var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
+        try {
+        	// Await Deployment of the Smart Contract
+            var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
 
-        // Expected Value for Contract
-        var expected_goal = 50;
+            // Expected Value for Contract
+            var expected_goal = 50;
 
-        // Current Goal Default Value for Contract
-        var goal = await myCustomCrowdsaleInstance.getGoal();
+             // Retrieve Current cap value in CustomCrowdsale Contract
+            var goal = await myCustomCrowdsaleInstance.getGoal();
 
-        assert.equal(goal.toNumber(), expected_goal, 'CustomCrowdsale Contract Should have a Goal of 50');
+            assert.equal(goal.toNumber(), expected_goal, 'CustomCrowdsale Contract Should have a Goal of 50');
+        } catch(err) {
+            console.log(err);
+        }
     });
 
     /**
-     * Evaluate if the current CustomCrowdsale is able to perform the necesary actions once the goal is reached
+     * Evaluate if the current CustomCrowdsale is able to perform the necesary actions once the goal is reached in the CustomCrowdsale
      */
     it('[  Tx  ]: Contract should be able to close if the goal has been fullfilled', async () => {
-        // Await Deployment of the Smart Contracts
-        var myTokenInstance = await myToken.deployed();
-        var myWethInstance = await myWeth.deployed();
-        var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
+        try {
+            // Await Deployment of the Smart Contracts
+            var myTokenInstance = await myToken.deployed();
+            var myWethInstance = await myWeth.deployed();
+            var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
 
-        // Wait for all the Deployements to be over
-        Promise.all([myTokenInstance, myWethInstance, myCustomCrowdsaleInstance]);
+            // Wait for all the Deployements to be over
+            Promise.all([myTokenInstance, myWethInstance, myCustomCrowdsaleInstance]);
+        } catch(err) {
+            console.log(err);
+        }
     });
 
     /**
-     * Evaluate if the current CustomCrowdsale
+     * Evaluate if the current CustomCrowdsale is able to reject a claim operation that does not meet the current time constraints in the CustomCrowdsale
      */
     it('[  Tx  ]: Contract should be able to reject a claim if the releaseTime requirements are not fullfilled', async () => {
-        // Await Deployment of the Smart Contracts
-        var myTokenInstance = await myToken.deployed();
-        var myWethInstance = await myWeth.deployed();
-        var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
+        try {
+            // Await Deployment of the Smart Contracts
+            var myTokenInstance = await myToken.deployed();
+            var myWethInstance = await myWeth.deployed();
+            var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
 
-        // Wait for all the Deployements to be over
-        Promise.all([myTokenInstance, myWethInstance, myCustomCrowdsaleInstance]);
+            // Wait for all the Deployements to be over
+            Promise.all([myTokenInstance, myWethInstance, myCustomCrowdsaleInstance]);
+        } catch(err) {
+            console.log(err);
+        }
     });
 
     /**
-     * Evaluate if the current CustomCrowdsale
+     * Evaluate if the current CustomCrowdsale is able to reject a buy operation that does not meet the current cap limit in the CustomCrowdsal
      */
     it('[  Tx  ]: Contract should be able to reject an buy that is larger than the current cap', async () => {
-        // Await Deployment of the Smart Contracts
-        var myTokenInstance = await myToken.deployed();
-        var myWethInstance = await myWeth.deployed();
-        var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
+        try {
+            // Await Deployment of the Smart Contracts
+            var myTokenInstance = await myToken.deployed();
+            var myWethInstance = await myWeth.deployed();
+            var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
 
-        // Wait for all the Deployements to be over
-        Promise.all([myTokenInstance, myWethInstance, myCustomCrowdsaleInstance]);
+            // Wait for all the Deployements to be over
+            Promise.all([myTokenInstance, myWethInstance, myCustomCrowdsaleInstance]);
+        } catch(err) {
+            console.log(err);
+        }
     });
 
     /**
@@ -106,7 +133,6 @@ contract('CustomCrowdsale', (accounts) => {
             // Wait for all the Deployements to be over
             Promise.all([myTokenInstance, myWethInstance, myCustomCrowdsaleInstance]);
 
-
             /**
               * Make a deposit in the WETH9 Contract
               */
@@ -119,7 +145,6 @@ contract('CustomCrowdsale', (accounts) => {
             // Assertion for the Current deposit vs Expected deposit of WETH9
             assert.equal(String(depositedWeth), String(expectedWeth9), 'myWethInstance Contract Should have x ether as currentWethBalance');
 
-
             /**
               * Make a approval operation in the current CustomCrowsale Contract of the previous amount of WETH9
               */
@@ -129,7 +154,6 @@ contract('CustomCrowdsale', (accounts) => {
             // Assertion for the Current Balance vs Expected deposit of WETH9
             assert.equal(String(currentWethBalance), String(expectedWeth9), 'myWethInstance Contract Should have x ether as currentWethBalance');
 
-
             /**
               * Check Current state of the CustomCrowdsale (Open)
               */
@@ -137,7 +161,6 @@ contract('CustomCrowdsale', (accounts) => {
             var isCompleted =  await myCustomCrowdsaleInstance.isCompleted();
             // Assertion of the Current state vs Expected stateof the CustomCrowdsale
             assert.equal(isCompleted.valueOf(), false, 'CustomCrowdsale Contract Should have a hasClosed of false');
-
 
             /**
               * Perform a buy in the CustomCrowdsale
@@ -148,7 +171,6 @@ contract('CustomCrowdsale', (accounts) => {
             var currentTokenToBuy = 5;
             // Perform a buy of the previous defined amount
             await myCustomCrowdsaleInstance.buyToken(currentTokenToBuy, {from:account0});
-
 
             /**
               * Simulate the closing & apply the release time to the CustomCrowdsale
@@ -196,8 +218,9 @@ contract('CustomCrowdsale', (accounts) => {
             //     console.log(events) // same results as the optional callback above
             // });
 
-        } catch(error) {
-            console.log(error);
+
+        } catch(err) {
+            console.log(err);
         }
     });
-});   
+});

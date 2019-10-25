@@ -1,31 +1,30 @@
 /**
- * Init() Section for the Deployed Contracts CustomToken, WETH9
+ * Init() Section for the Deployed Contract CustomToken
  */
 var myToken = artifacts.require("../contracts/tokens/CustomToken.sol");
-var myWeth = artifacts.require("canonical-weth/contracts/WETH9.sol");
 
 contract('CustomToken', (accounts) => {
+
     /**
      * Evaluate if the current CustomToken Contract has de correct balance since deploy.
      */
-    // it('[ Init ]: Contract should have a Default Balance of 1000', async () => {
-    //     try {
-    //         // Finish the deployment of the CustomToken Contract instance.
-    //         var myCustomTokenInstance = await myToken.deployed();
-    //         // Promise(myCustomTokenInstance);
+    it('[ Init ]: Contract should have a Default Balance of 1000 Tokens', async () => {
+        try {
+            // Await Deployment of the Smart Contract
+            var myCustomTokenInstance = await myToken.deployed();
 
-    //         var accountOne = accounts[0];        
-    //         var currentBalance = (await myCustomTokenInstance.getBalance.call(accountOne));
-    //         console.log(currentBalance);
-    //         // Expected Returned Balance Value
-    //         var expectedBalance = 1000;
-            
-    //         assert.equal(currentBalance, expectedBalance, 'Token Contract should have atleast 1000 after inicialization');
-    //     } catch(err) {
-    //         console.log(err.message)
-    //     }
-    // });
+            // Default values for the accounts making the operations
+            //var balance_account1 = await myCustomTokenInstance.getBalance(account0);
+            //var currentSupply = (await myCustomTokenInstance.totalSupply({from:accounts[0]}));
 
+            // Expected current value for totalSupply in CustomToken
+            var expectedSupply = 1000;
+
+            //assert.equal(currentSupply, expectedSupply, 'Token Contract should have atleast 1000 after inicialization');
+        } catch(err) {
+            console.log(err.message);
+        }
+    });
 
     /**
      * Evaluate if the current CustomToken Contract has the correct name for the defined ERC20Detailed
@@ -34,20 +33,18 @@ contract('CustomToken', (accounts) => {
         try {
             // Await Deployment of the Smart Contract
             var myCustomTokenInstance = await myToken.deployed();
-            // Promise(myCustomTokenInstance);
-            
-            // Default Values
-            var currentName = await myCustomTokenInstance.name();
 
             // Expected Return Values
             var expectedName = "Custom Token Currency";
 
+            // Retrieve value for name in CustomToken
+            var currentName = await myCustomTokenInstance.name();
+
             assert.equal(currentName.valueOf(), expectedName, 'Token Contract does not comply with the Expected Name Value.');
         } catch(err) {
-            console.log(err.message)
+            console.log(err.message);
         }
     });
-
 
     /**
      * Evaluate if the current CustomToken Contract has the correct symbol for the defined ERC20Detailed
@@ -65,10 +62,9 @@ contract('CustomToken', (accounts) => {
 
             assert.equal(currentSymbol.valueOf(), expectedSymbol, 'Token Contract does not comply with the Expected Symbol Value.');
         } catch(err) {
-            console.log(err.message)
+            console.log(err.message);
         }
     });
-
 
     /**
      * Evaluate if the current CustomToken Contract has the correct decimals for the defined ERC20Detailed
@@ -78,61 +74,63 @@ contract('CustomToken', (accounts) => {
             // Await Deployment of the Smart Contract
             var myCustomTokenInstance = await myToken.deployed();
 
+            // Expected value for decimals in CustomToken
+            var expectedDecimals = 18;
             // Retrieve current value for the decimals in CustomToken
             var currentDecimals = await myCustomTokenInstance.decimals();
 
-            // Expected value for decimals in CustomToken
-            var expectedDecimals = 18;
-
             assert.equal(currentDecimals.valueOf(), expectedDecimals, 'Token Concract does not comply with the Expected Decimal Value.');
         } catch(err) {
-            console.log(err.message)
+            console.log(err.message);
         }
     });
 
+    /**
+     * Evaluate if the current CustomToken Contract is able to reject an Overflow Attack in the transfer() operation
+     */
     it('[  Tx  ]: Contract should be able to Reject OverFlow on transfer()', async () => {
         try {
             // Await Deployment of the Smart Contract
             var myCustomTokenInstance = await myToken.deployed();
 
-            // Default Values.
+            // Default values for the accounts making the operations
             var accountOne = accounts[0];
             var accountTwo = accounts[1];
 
-            // Get initial balances from accountOne and accountTwo.
+            // Retrieve initial balances from accountOne and accountTwo.
             var accountOneStartingBalance = (await myCustomTokenInstance.getBalance.call(accountOne)).toNumber();
             var accountTwoStartingBalance = (await myCustomTokenInstance.getBalance.call(accountTwo)).toNumber();
 
-            // Make Transaction from accountOne to accountTwo.
+            // Perfom Transaction from accountOne to accountTwo.
             var amount = 999999999999999;
             await myCustomTokenInstance.transfer(accountTwo, amount);
-
-            } catch (error) {
-                assert.equal(error.message, 'Returned error: VM Exception while processing transaction: revert', "This Contract is vulnerable to OverFlow Attacks");
-            }
+        } catch (error) {
+            assert.equal(error.message, 'Returned error: VM Exception while processing transaction: revert', "This Contract is vulnerable to OverFlow Attacks");
+        }
     });
 
+    /**
+     * Evaluate if the current CustomToken Contract is able to reject an UnderFlow Attack in the transfer() operation
+     */
     it('[  Tx  ]: Contract should be able to Reject UnderFlow on transfer() using SafeMath', async () => {
         try {
 
             var myCustomTokenInstance = await myToken.deployed();
 
-            // Default Values.
+            // Default values for the accounts making the operations
             var accountOne = accounts[0];
             var accountTwo = accounts[1];
 
-
-            // Get initial balances from accountOne and accountTwo.
+            // Retrieve initial balances from accountOne & accountTwo.
             var accountOneStartingBalance = (await myCustomTokenInstance.getBalance.call(accountOne)).toNumber();
             var accountTwoStartingBalance = (await myCustomTokenInstance.getBalance.call(accountTwo)).toNumber();
 
-            // Make Transaction from accountOne to accountTwo.
+            // Perform Transaction from accountOne to accountTwo.
             var amount = -10000;
             await myCustomTokenInstance.transfer(accountTwo, amount);
-
-            } catch (error) {
-                assert.equal(error.message, 'Returned error: VM Exception while processing transaction: revert', "This Contract is vulnerable to UnderFlow Attacks");
-            }
+        } catch (error) {
+            assert.equal(error.message, 'Returned error: VM Exception while processing transaction: revert', "This Contract is vulnerable to UnderFlow Attacks");
+        }
     });
 });
 
