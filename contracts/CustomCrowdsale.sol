@@ -84,17 +84,15 @@ contract CustomCrowdsale is Ownable {
     }
 
     function claimContribution() public returns (bool) {
-        uint256 claimedTokens = contributions[msg.sender] * rate;
-        if(contributions[msg.sender] != 0) {
+        uint256 claimedTokens = contributions[msg.sender].mul(rate);
+        if(contributions[msg.sender] != 0 && token.totalSupply() > 0) {
             require(token.transfer(msg.sender, claimedTokens), "Unable to transfer");
-            token.transfer(msg.sender, claimedTokens);
             contributions[msg.sender] = 0;
             delete contributions[msg.sender];
             emit ClaimContribution(msg.sender, claimedTokens);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
