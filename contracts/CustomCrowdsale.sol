@@ -33,12 +33,12 @@ contract CustomCrowdsale is Ownable {
     event Contribution(address _from, uint256 _amount);
     event ClaimContribution(address _from, uint256 _amount);
     event CloseCrowdsale(address _from, uint256 time);
-    event ValorAddress(address _sender, uint256 _claimedTokens);
+    event claimContributionPreTx(address _sender, uint256 _claimedTokens, uint256 _balance);
 
     // Setting Up Modifiers for the Finalize Function
     modifier whenICOCompleted {
         require(ICOCompleted, 'CustomCrowdsale Not Completed');
-        //require(closingTime > 0 && releaseTime < now, 'CustomCrowdsale releases the CustomTokens 2min afer');
+        require(closingTime > 0 && releaseTime < now, 'CustomCrowdsale releases the CustomTokens 2min afer');
         _;
     }
 
@@ -86,15 +86,13 @@ contract CustomCrowdsale is Ownable {
 
 
     function claimContribution() public returns (bool) {
-        //uint256 claimedTokens = contributions[msg.sender].mul(rate);
+        uint256 claimedTokens = contributions[msg.sender].mul(rate);
 
-        uint256 claimedTokens = contributions[msg.sender];
-        emit ValorAddress(msg.sender, claimedTokens);
-        if(token.totalSupply() > 0 && contributions[msg.sender] != 0) {
+        emit claimContributionPreTx(msg.sender, claimedTokens, contributions[msg.sender]);
+        if(contributions[msg.sender] != 0) {
+            emit ClaimContribution(msg.sender, claimedTokens);
             require(token.transfer(msg.sender, claimedTokens), "transfer() CustomTokens has Failed");
             contributions[msg.sender] = 0;
-            delete contributions[msg.sender];
-            emit ClaimContribution(msg.sender, claimedTokens);
             return true;
         }
         return false;

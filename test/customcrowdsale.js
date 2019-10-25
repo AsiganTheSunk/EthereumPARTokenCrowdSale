@@ -76,13 +76,13 @@ contract('CustomCrowdsale', (accounts) => {
             assert.equal(String(currentWethBalance), String(expectedWeth9), 'myWethInstance Contract Should have x ether as currentWethBalance');
 
             var releaseTime = (await myCustomCrowdsaleInstance.getReleaseTime());          
-            // await time.increaseTo(releaseTime);
+            await time.increaseTo(releaseTime);
 
             // Evaluating Status of Custom Crowdsale (Open)
             var isCompleted =  await myCustomCrowdsaleInstance.isCompleted();
             assert.equal(isCompleted.valueOf(), false, 'CustomCrowdsale Contract Should have a hasClosed of true');
 
-            //var currentTokenToBuy = new BN(web3.utils.toWei('3')); 
+            // operar con numero entero y no con wei, son unidades de token.
             currentTokenToBuy = 5;
             await myCustomCrowdsaleInstance.buyToken(currentTokenToBuy, {from:accounts[0]});
 
@@ -106,13 +106,12 @@ contract('CustomCrowdsale', (accounts) => {
             var balance_account1 = await myTokenInstance.getBalance(account0);
             console.log('       +  Current Tokens in Account0 ' + balance_account1.toNumber());
 
-
-            // let events = myCustomCrowdsaleInstance.allEvents({fromBlock: 0, toBlock: 'latest'});
-            // console.log(events);
+            var currentContribution  = await myCustomCrowdsaleInstance.getCurrentContribution();
+            console.log('       +  CurrentContribution in Crowdsale '+ String(currentContribution));
 
             myCustomCrowdsaleInstance.getPastEvents({fromBlock: 0, toBlock: 'latest'}, function(error, events){ console.log(events); })
             .then(function(events){
-                console.log(events) // same results as the optional callback above
+                //console.log(events) // same results as the optional callback above
             });
         } catch(error) {
             console.log(error);
