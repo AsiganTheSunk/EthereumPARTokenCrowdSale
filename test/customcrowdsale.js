@@ -80,7 +80,7 @@ contract('CustomCrowdsale', (accounts) => {
 
             // Evaluating Status of Custom Crowdsale (Open)
             var isCompleted =  await myCustomCrowdsaleInstance.isCompleted();
-            assert.equal(isCompleted.valueOf(), false, 'CustomCrowdsale Contract Should have a hasClosed of true');
+            assert.equal(isCompleted.valueOf(), false, 'CustomCrowdsale Contract Should have a hasClosed of false');
 
             // operar con numero entero y no con wei, son unidades de token.
             currentTokenToBuy = 5;
@@ -89,7 +89,7 @@ contract('CustomCrowdsale', (accounts) => {
             // Evaluating Status of Custom Crowdsale (Close)
             await myCustomCrowdsaleInstance.closeICO();
             var valueIsCompleted =  await myCustomCrowdsaleInstance.isCompleted();
-            assert.equal(valueIsCompleted.valueOf(), true, 'CustomCrowdsale Contract Should have a hasClosed of false');
+            assert.equal(valueIsCompleted.valueOf(), true, 'CustomCrowdsale Contract Should have a hasClosed of true');
        
             var currentTokenInCrowdsale = await myTokenInstance.getBalance(myCustomCrowdsaleInstance.address);
             console.log('       +  Current Tokens in Crowdsale '+ String(currentTokenInCrowdsale));
@@ -106,8 +106,8 @@ contract('CustomCrowdsale', (accounts) => {
             var balance_account1 = await myTokenInstance.getBalance(account0);
             console.log('       +  Current Tokens in Account0 ' + balance_account1.toNumber());
 
-            var currentContribution  = await myCustomCrowdsaleInstance.getCurrentContribution();
-            console.log('       +  CurrentContribution in Crowdsale '+ String(currentContribution));
+            var currentTokenBalance  = await myTokenInstance.getBalance(myCustomCrowdsale.address);
+            console.log('       +  CurrentContribution in Crowdsale '+ String(currentTokenBalance));
 
             myCustomCrowdsaleInstance.getPastEvents({fromBlock: 0, toBlock: 'latest'}, function(error, events){ console.log(events); })
             .then(function(events){
