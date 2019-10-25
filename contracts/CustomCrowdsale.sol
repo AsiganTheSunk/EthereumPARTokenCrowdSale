@@ -43,7 +43,7 @@ contract CustomCrowdsale is Ownable {
     // Setting Up Modifiers for the Finalize Function
     modifier whenICOCompleted {
         require(ICOCompleted, 'CustomCrowdsale Not Completed');
-        require(closingTime > 0 && releaseTime < now, 'CustomCrowdsale releases the CustomTokens 2min afer');
+        require(now >= releaseTime, 'CustomCrowdsale releases the CustomTokens 2min after');
         _;
     }
 
@@ -103,7 +103,7 @@ contract CustomCrowdsale is Ownable {
         return true;
     }
 
-
+    //
     function claimContribution() public whenICOCompleted returns (bool) {
         uint256 claimedTokens = contributions[msg.sender].mul(rate);
 
