@@ -91,13 +91,8 @@ contract('CustomCrowdsale', (accounts) => {
             console.log('       +  Current Tokens in Crowdsale '+ String(currentTokenInCrowdsale));
             var currentRate = myCustomCrowdsaleInstance.getRate();
 
-
-            //var numberOfSelledTokens = currentTokenToBuy * currentRate;
             await myTokenInstance.approve(myCustomCrowdsale.address, currentTokenToBuy);
-            //await myCustomCrowdsaleInstance.claimContribution();
-            
-            currentTokenInCrowdsale = await myTokenInstance.getBalance(myCustomCrowdsaleInstance.address);
-            console.log('       +  Current Tokens in Crowdsale '+ String(currentTokenInCrowdsale));
+            await myCustomCrowdsaleInstance.claimContribution();
  
             var currentContribution  = await myCustomCrowdsaleInstance.getCurrentContribution();
             console.log('       +  CurrentContribution in Crowdsale '+ String(currentContribution));
