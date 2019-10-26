@@ -2,6 +2,7 @@
  * Init() Section for the Deployed Contract CustomToken
  */
 var myToken = artifacts.require("../contracts/tokens/CustomToken.sol");
+var myCustomCrowdsale = artifacts.require("../contracts/CustomCrowdsale.sol");
 
 contract('CustomToken', (accounts) => {
 
@@ -12,15 +13,15 @@ contract('CustomToken', (accounts) => {
         try {
             // Await Deployment of the Smart Contract
             var myCustomTokenInstance = await myToken.deployed();
+            var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
 
             // Default values for the accounts making the operations
-            //var balance_account1 = await myCustomTokenInstance.getBalance(account0);
-            //var currentSupply = (await myCustomTokenInstance.totalSupply({from:accounts[0]}));
+            var currentTokenInCrowdsale = await myCustomTokenInstance.getBalance(myCustomCrowdsaleInstance.address);
 
             // Expected current value for totalSupply in CustomToken
             var expectedSupply = 1000;
 
-            //assert.equal(currentSupply, expectedSupply, 'Token Contract should have atleast 1000 after inicialization');
+            assert.equal(currentTokenInCrowdsale, expectedSupply, 'Token Contract should have atleast 1000 after inicialization');
         } catch(err) {
             console.log(err.message);
         }
