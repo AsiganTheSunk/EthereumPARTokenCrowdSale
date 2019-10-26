@@ -1,5 +1,5 @@
 /**
- * Init() Section for the Deployed Contract CustomToken
+ * Init() Section for the Deployed Contracts CustomToken & CustomCrowdsale
  */
 var myToken = artifacts.require("../contracts/tokens/CustomToken.sol");
 var myCustomCrowdsale = artifacts.require("../contracts/CustomCrowdsale.sol");
