@@ -38,7 +38,7 @@ contract CustomCrowdsale is Ownable {
     uint256 public rate;
     uint256 public cap;
     uint256 public contributionGoal;
-    uint256 public currentContribution;
+    uint256 public currentContribution = 0;
 
     // Time Constraint Variables for the CustomCrowdsale
     uint256 public startingTime;
