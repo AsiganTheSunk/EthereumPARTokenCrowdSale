@@ -5,6 +5,7 @@ import './App.css'
 import getWeb3 from "./utils/getWeb3";
 import crowdsaleArtifact from "./contracts/CustomCrowdsale.json";
 import tokenArtifact from "./contracts/CustomToken.json";
+import wethArtifact from "./contracts/WETH9.json";
 
 class App extends Component {
     state = { web3: null, accounts: null, contract: null, networkId: null, rate: null };
@@ -32,6 +33,13 @@ class App extends Component {
                 deployedNetworkToken && deployedNetworkToken.address,
             );
 
+            const deployedNetworkWeth = wethArtifact.networks[networkId];
+            const wethInstance = new web3.eth.Contract(
+                wethArtifact.abi,
+                deployedNetworkWeth && deployedNetworkWeth.address,
+            );
+
+
             //this.setState({ web3, accounts, contract: CustomTokenInstance, networkId }, this.runExample);
             this.setState({ web3, accounts, contract: crowdsaleInstance, networkId }, this.runExample);
       } catch (err) {
@@ -47,12 +55,25 @@ class App extends Component {
         //await contract.methods.set(5).send({ from: accounts[0] });
 
         // Get the value from the contract to prove it worked.
-        //const response = await contract.methods.decimals().call();
+        // const response = await contract.methods.decimals().call();
+        // const response = await contract.methods.name().call();
+        // const response = await contract.methods.symbol().call();
 
-        //const response = await contract.methods.getTokenTotalSupply().call();
-        //const response = await contract.methods.getRate().call();
-        const response = await contract.methods.getRate().call();
+        // const response = await contract.methods.getTokenTotalSupply().call();
+        // const response = await contract.methods.getRate().call();
+        // const response = await contract.methods.getCap().call();
+        // const response = await contract.methods.getGoal().call();
+        // const response = await contract.methods.getCurrentContribution().call();
+        // const response = await contract.methods.getStartingTime().call();
+        // const response = await contract.methods.getClosingTime().call();
+        // const response =  new String(await contract.methods.getReleaseTime().call());
+        // const response = new String(await contract.methods.isCompleted().call());
 
+
+        // Falla?¿?¿?¿
+        //const response = await contract.buyToken(1).call();
+        const response = await contract.claimContribution().call();
+        //const response = await contract.getWethTotalSupply().call();
 
         // Update state with the result.
         this.setState({ rate: response });
