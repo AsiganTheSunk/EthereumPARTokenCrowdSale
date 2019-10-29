@@ -104,6 +104,8 @@ contract CustomCrowdsale is Ownable {
         require(contributionGoal > cap, 'Goal value must be above cap Value');
     }
 
+    // hace falta añadir una funcion de fallback para poder cambiar imagino el msg.sender cuando se llama a la funcion.
+
     // Buy Funtion for the CustomCrowdsale
     function buyToken(uint256 _contribution) public returns (bool) {
         // Requirement contribution must be less than the Cap
