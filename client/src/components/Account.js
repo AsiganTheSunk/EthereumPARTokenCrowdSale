@@ -3,7 +3,11 @@ import React from 'react';
 function Account(props) {
     return (
         <div>
-            <b> Account Address: </b> {props.accountId} <br/>
+            <br/>
+            <b> [ Account Address Information ] </b>
+            <br/>
+            {props.accountId}
+            <br/>
         </div>
     )
 };
