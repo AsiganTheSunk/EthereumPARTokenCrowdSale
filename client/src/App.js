@@ -22,9 +22,11 @@ import Disclaimer from './components/Disclaimer';
 import WethInformation from './components/WethInformation';
 import TokenInformation from "./components/TokenInformation";
 import CrowdsaleInformation from "./components/CrowdsaleInformation";
-import FailToLoad from "./components/FailToLoad";
 import LoadingMessage from "./components/LoadingMessage";
 import Account from "./components/Account";
+
+// Unused Imports, pending implementation
+import FailToLoad from "./components/FailToLoad";
 
 class App extends Component {
     constructor(props) {
@@ -73,6 +75,7 @@ class App extends Component {
         this.setNetwork();
     };
 
+    // TODO: move to a separate utils file
     // Method to set the Proper name to the Network
     async setNetwork () {
         const { networkId} = this.state;
@@ -99,6 +102,7 @@ class App extends Component {
         this.setState({ networkName: currentNetworkName });
     };
 
+    // TODO: move to a separate utils file
     // Method for loading Contracts Deployed in the Network
     async loadContracts() {
         try {
@@ -152,6 +156,7 @@ class App extends Component {
         }
     };
 
+    // TODO: move to a separate utils file
     // Method for loading Static Data from the Contracts
     loadStaticContractData = async () => {
         try {
@@ -219,21 +224,23 @@ class App extends Component {
             } = this.state;
 
             var weiAmount = Web3.utils.toWei(currentAmount);
+
             console.log('Current Wei Amount: ' + weiAmount);
             console.log(tokenContractAddr, wethContractAddr, mainContractAddr);
+
             await wethContract.methods.deposit().send({value: weiAmount, from:accounts[0]});
             await wethContract.methods.approve(mainContractAddr, weiAmount).send({from:accounts[0]});
 
             await mainContract.methods.buyToken(currentAmount).send({from:accounts[0]});
             await tokenContract.methods.approve(mainContractAddr, currentAmount).send({from:accounts[0]});
 
-           // var batch = new Web3.BatchRequest();
-           // batch.add(wethContract.methods.deposit().send({value: weiAmount, from:accounts[0]}));
-           // batch.add(wethContract.methods.approve(mainContractAddr, weiAmount).send({from:accounts[0]}));
-           // batch.add(mainContract.methods.buyToken(currentAmount).send({from:accounts[0]}));
-           // batch.add(tokenContract.methods.approve(mainContractAddr, currentAmount).send({from:accounts[0]}));
-           // batch.execute();
-
+            // TODO: does not appear to work, there is no call from metamask. CHECK MORE EXAMPLES
+            // var batch = new Web3.BatchRequest();
+            // batch.add(wethContract.methods.deposit().send({value: weiAmount, from:accounts[0]}));
+            // batch.add(wethContract.methods.approve(mainContractAddr, weiAmount).send({from:accounts[0]}));
+            // batch.add(mainContract.methods.buyToken(currentAmount).send({from:accounts[0]}));
+            // batch.add(tokenContract.methods.approve(mainContractAddr, currentAmount).send({from:accounts[0]}));
+            // batch.execute();
        } catch(err){
             console.log(err.message);
         }
@@ -249,19 +256,23 @@ class App extends Component {
         }
     };
 
+    // ** TIER 1: IMPLEMENTATION
+    // TODO: Add Claim Button, Close CrowdsaleButton (Debugging)
+    // TODO: Messages for Success/Failed Transactions
+
+    // ** TIER 2: IMPLEMENTATION + REFACTOR
+    // TODO: More Detailed Error on Web3, Contracts connection
+    // TODO: Move Information Block into a container component
+    // TODO: Remove Center Html5 for center style using css
     // TODO: Move form to form.js component
     render() {
         if (!this.state.web3) {
-            return (
-                <LoadingMessage/>
-                //<FailToLoad/>
-                );
+            return (<LoadingMessage/>);
         }
         return (
             <div>
                 <Nav appName={this.appName} network={this.state.networkName} />
                 <center>
-
                     <Account accountId={this.state.accounts[0]}/>
                     <p>
                         <WethInformation
@@ -300,7 +311,7 @@ class App extends Component {
                 </center>
             </div>
             )
-    }
+        }
 };
 
 export default App;
