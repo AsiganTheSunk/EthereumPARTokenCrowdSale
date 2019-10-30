@@ -1,35 +1,46 @@
+// Import React & React Components
 import React, { Component } from 'react'
 
+// Import Crowdsale Logo
+import logo from './ETH-Icon.png'
+
+// Import Crowdsale Styles
 import './App.css'
+
+// Import getWeb3Provider & Web3
 import getWeb3 from "./utils/getWeb3";
+import Web3 from 'web3';
+
+// Import ABI for the Smart Contracts
 import crowdsaleArtifact from "./contracts/CustomCrowdsale.json";
 import tokenArtifact from "./contracts/CustomToken.json";
 import wethArtifact from "./contracts/WETH9.json";
-import logo from './ETH-Icon.png'
-import Nav from './components/Nav';
-import InstallMetamask from './components/InstallMetamask';
-import UnlockMetamask from './components/UnlockMetamask';
-//import Web3 from 'web3'
 
+// Import Components for the App
+import Nav from './components/Nav';
+import Disclaimer from './components/Disclaimer';
+import WethInformation from './components/WethInformation';
+import TokenInformation from "./components/TokenInformation";
+import CrowdsaleInformation from "./components/CrowdsaleInformation";
+import FailToLoad from "./components/FailToLoad";
+import LoadingMessage from "./components/LoadingMessage";
+import Account from "./components/Account";
 
 class App extends Component {
     constructor(props) {
         super(props);
         this.appName = 'CustomTokenCrodwsale';
 
-        // this.isWeb3 = true;
-        // this.isWeb3Locked = false;
-
         // Crowdsale Static Data Variables
         this.crowdsaleRate = 0;
         this.crowdsaleGoal = 0;
-        this.crowdsaleCap = null;
+        this.crowdsaleCap = 0;
         this.crowdsaleStart = 0;
         this.crowdsaleRelease = 0;
         this.crowdsaleClose = 0;
         this.crowdsaleBalance = 0;
 
-        // Crowdsale Dinamic Data Variables TODO: move to state?
+        // Crowdsale Dinamic Data Variables
         this.crowdsaleTokenSupply = 0;
         this.crowdsaleWethSupply = 0;
         this.crowdsaleContribution = 0;
@@ -45,15 +56,19 @@ class App extends Component {
         this.tokenBalance = '';
 
         this.state = {
-            web3: null, accounts: null, mainContract: null, tokenContract: null, wethContract: null, networkId: null, networkName: null, time: null
+            web3: null, accounts: null,
+            mainContract: null, tokenContract: null, wethContract: null,
+            mainContractAddr: null, tokenContractAddr: null,  wethContractAddr: null,
+            networkId: null, networkName: null, time: null,
         };
 
-        this.onLaunchClicked = this.onLaunchClicked.bind(this);
+       this.onLaunchClicked = this.onLaunchClicked.bind(this);
+       // Bind Event for Claim Button
+       //this.onLaunchClicked = this.onLaunchClicked.bind(this);
     }
 
     // LOADING CONTRACT AND NETWORK DATA
     UNSAFE_componentWillMount() {
-        //var interval = setInterval(() => this.setState({ time: (Date.now() / 60000) - this.state.time }), 60000);
         this.loadContracts();
         this.setNetwork();
     };
@@ -91,10 +106,10 @@ class App extends Component {
             const accounts = await web3.eth.getAccounts();
             const networkId = await web3.eth.net.getId();
 
-            const deployedNetwork = crowdsaleArtifact.networks[networkId];
+            const deployedNetworkCrowdsale = crowdsaleArtifact.networks[networkId];
             const crowdsaleInstance = new web3.eth.Contract(
                 crowdsaleArtifact.abi,
-                deployedNetwork && deployedNetwork.address,
+                deployedNetworkCrowdsale && deployedNetworkCrowdsale.address,
             );
 
             const deployedNetworkToken = tokenArtifact.networks[networkId];
@@ -109,7 +124,15 @@ class App extends Component {
                 deployedNetworkWeth && deployedNetworkWeth.address,
             );
 
-            this.setState({ web3, accounts, mainContract: crowdsaleInstance, wethContract: wethInstance, tokenContract: tokenInstance, networkId }, this.loadStaticContractData, this.loadDynamicContractData);
+            this.setState({
+                web3, accounts,
+                mainContract: crowdsaleInstance,
+                wethContract: wethInstance,
+                tokenContract: tokenInstance,
+                mainContractAddr: deployedNetworkCrowdsale.address,
+                wethContractAddr: deployedNetworkWeth.address,
+                tokenContractAddr: deployedNetworkToken.address,
+                networkId }, this.loadStaticContractData, this.loadDynamicContractData);
         } catch (err) {
             // Catch any errors for any of the above operations.
             alert(`Failed to load web3, accounts, or contract. Check console for details.`);
@@ -121,12 +144,9 @@ class App extends Component {
     loadDynamicContractData = async () => {
         try {
             const { mainContract } = this.state;
-            // Stores a given value, 5 by default.
-            //await contract.methods.set(5).send({ from: accounts[0] });
             this.crowdsaleWethSupply = await mainContract.methods.getWethTotalSupply().call();
             this.crowdsaleTokenSupply = await mainContract.methods.getCurrentContribution().call();
             this.crowdsaleContribution = await mainContract.methods.getTokenTotalSupply().call();
-
         } catch(err) {
             console.log(err);
         }
@@ -134,9 +154,8 @@ class App extends Component {
 
     // Method for loading Static Data from the Contracts
     loadStaticContractData = async () => {
-        //try {
+        try {
             const { mainContract, tokenContract, wethContract } = this.state;
-
             // Get static values from the contract WETH9 to prove it was correcly loaded by Web3js
             this.wethName = await wethContract.methods.name().call();
             this.wethSymbol = await wethContract.methods.symbol().call();
@@ -148,32 +167,29 @@ class App extends Component {
             this.tokenSymbol = await tokenContract.methods.symbol().call();
             this.tokenDecimals = await tokenContract.methods.decimals().call();
 
-            // Assert ownership of the customtoken?¿?¿
+            // Get static values from the contract CustomCrowdsale to prove it was correctly loaded by Web3js
             this.crowdsaleRate = await mainContract.methods.getRate().call();
             this.crowdsaleCap = await mainContract.methods.getCap().call();
             this.crowdsaleGoal = await mainContract.methods.getGoal().call();
-            this.crowdsaleContribution = await mainContract.methods.getCurrentContribution().call().valueOf();
-            this.crowdsaleStart = await mainContract.methods.getStartingTime().call();
-            this.crowdsaleClose = await mainContract.methods.getClosingTime().call();
+            this.crowdsaleStart = await mainContract.methods.getStartingTime().call(); // TODO: Change to a Proper Date Format
+            this.crowdsaleClose = await mainContract.methods.getClosingTime().call();  // TODO: Change to a Proper Date Format
             this.crowdsaleRelease = ((await mainContract.methods.getReleaseTime().call()) - this.crowdsaleClose) / 60000;
             this.crowdsaleState = (await mainContract.methods.isCompleted().call()).toString();
-       // } catch(err) {
-        //     console.log(err);
-        //}
+       } catch(err) {
+            console.log(err);
+       }
     };
-
 
     onLaunchClicked (event) {
         event.preventDefault();
         this.setState({isTransferButtonDisabled: true});
         let amount = this.state.amount;
         if (amount === '') {
-            // Alert on Submit if the amount is 0
             alert("Your Invested Amount Must be more than 0");
         }
-        if (amount !== '' && Number(amount)) {
-            // Time Out the button to avoid over transfering of the funds and spam clicking.
-            alert("Your Invested Amount is Being Transfer ...");
+        if (amount !== '' && Number(amount) && amount > Number(0)) {
+            // Time Out the button to avoid over transfering funds and spam clicking (1s delay).
+            this.buyTokensTransaction(amount);
         }
         setTimeout(() => this.setState({ isTransferButtonDisabled: false }), 1000);
     };
@@ -184,102 +200,74 @@ class App extends Component {
         let err = '';
         if (nam === "amount") {
             if (val !=='' && !Number(val)) {
-                err = <strong>Your age must be a number</strong>;
+                err = <strong>The cuantity must be a number, more than 0</strong>;
             }
         }
         this.setState({errormessage: err});
         this.setState({[nam]: val});
     };
 
-    mySubmitHandler = (event) => {
-        event.preventDefault();
+    buyTokensTransaction = async (currentAmount) => {
+       try {
+            const {
+                accounts,
+                mainContract, tokenContract, wethContract,
+                wethContractAddr,  tokenContractAddr, mainContractAddr
+            } = this.state;
 
+            var weiAmount = Web3.utils.toWei(currentAmount);
+            console.log('Current Wei Amount: ' + weiAmount);
+            console.log(tokenContractAddr, wethContractAddr, mainContractAddr);
+            await wethContract.methods.deposit().send({value: weiAmount, from:accounts[0]});
+            await wethContract.methods.approve(mainContractAddr, weiAmount).send({from:accounts[0]});
+
+            await mainContract.methods.buyToken(currentAmount).send({from:accounts[0]});
+            await tokenContract.methods.approve(mainContractAddr, currentAmount).send({from:accounts[0]});
+
+       } catch(err){
+            console.log(err.message);
+        }
     };
 
+    claimTokenTransaction = async () => {
+        try {
+            const { accounts, mainContract} = this.state;
+            await mainContract.methods.claimContribution().send({from: accounts[0]});
+        } catch(err){
+            console.log(err.message);
+        }
+    };
 
     render() {
-        const mystyle = {
-            color: "black",
-            backgroundColor: "lightblue",
-            padding: "10px",
-            fontFamily: "Arial",
-            width: 800,
-            textAlign: 'center'
-        };
-
-        const divstyle = {
-            backgroundColor: 'lightgrey',
-            width: 800,
-            alignSelf: 'center',
-            padding: 10,
-        };
-
-//        if(this.isWeb3Locked) {
-//            return ( )
-
-    if (!this.state.web3) {
+        if (!this.state.web3) {
+            return (
+                <LoadingMessage/>
+                //<FailToLoad/>
+                );
+        }
         return (
             <div>
+                <Nav appName={this.appName} network={this.state.networkName} />
                 <center>
-                {/*<UnlockMetamask message="Unlock Your Metamask/Mist Wallet" />*/}
-                    <b> Loading Web3, Accounts & Contracts ... </b>
+                    <Disclaimer/>
+                    <Account accountId={this.state.accounts[0]}/>
+                    <p>
+                        <WethInformation
+                            wethName={this.wethName} wethSymbol={this.wethSymbol} wethDecimals={this.wethDecimals} />
+                        <TokenInformation
+                            tokenName={this.tokenName} tokenSymbol={this.tokenSymbol}
+                            tokenDecimals={this.tokenDecimals} tokenBalance={this.tokenBalance} />
+                        <CrowdsaleInformation crowdsaleRate={this.crowdsaleRate} crowdsaleCap={this.crowdsaleCap}
+                                              crowdsaleGoal={this.crowdsaleGoal} crowdsaleBalance={this.crowdsaleBalance}
+                                              crowdsaleStart={this.crowdsaleStart} crowdsaleClose={this.crowdsaleClose}
+                                              crowdsaleRelease={this.crowdsaleRelease} crowdsaleState={this.crowdsaleState} />
+                    </p>
                 </center>
-            </div>
 
-        );
-    }
-    return (
-        <div>
-            <Nav appName={this.appName} network={this.state.networkName} />
-            <center>
                 <br/>
-                <div>
-                    <h1> <b>Select The  Amount & Start Contributing! </b></h1>
-
-
-                        <pre style={divstyle}> --------------------------------- DISCLAIMER ----------------------------------
-                        <br/>
-                        <br/><b>Custom Crowdsale</b> is not protected against <b>Reentry Attacks</b>
-                        <br/><b>Custom Crowdsale</b> is not fully protected against <b>UnderFlow/OverFlow Attacks</b>
-                        <br/>
-                        <br/> ------------------------------------------------------------------------------- </pre>
-                </div>
-            </center>
-            <form onSubmit={this.mySubmitHandler}>
-                <div>
-                    <center>
-                        <b> Account Address: </b> {this.state.accounts[0]} <br/>
-                        <p>
-                            wethInfo: <br/>
-                            <b> {this.wethName} </b> , <b> {this.wethSymbol} </b>, <b> {this.wethDecimals} </b> <br/>
-                            tokenInfo: <br/>
-                            <b> {this.tokenName}  </b>,  <b>{this.tokenSymbol} </b>,  <b> {this.tokenDecimals} </b>, <b> {this.tokenBalance} </b> <br/>
-                            crowdsaleInfo: <br/>
-                            <b> RATE: {this.crowdsaleRate} </b>, <b> CAP: {this.crowdsaleCap} </b>, <b> GOAL: {this.crowdsaleGoal} </b>, <b> BALANCE: {this.crowdsaleBalance} </b> <br/>
-                            <b> OPENING TIME: {this.crowdsaleStart} </b>, <b> CLOSING TIME: {this.crowdsaleClose} </b>, <b> RELEASE TIME: {this.crowdsaleRelease} </b>, <b> isClosed: {this.crowdsaleState} </b> <br/>
-                        </p>
-                        <div>User online for {this.state.time} minutes</div>
-                        <p>Enter your desired CustomToken Amount:</p>
-                        <input type='text' name='amount' onChange={this.myChangeHandler}/>
-
-                        <br/>
-                        <br/>
-                    </center>
-                </div>
-                <div>
-                    <center>
-                        <input type='submit' name='transfer' onClick={this.onLaunchClicked} disabled={this.state.isTransferButtonDisabled}/>
-                        {this.state.errormessage}
-                    </center>
-                </div>
-                <center>
-
-                </center>
-            </form>
-            <br/>
-        </div>
-        );
+            </div>
+            )
     }
-}
+};
 
 export default App;

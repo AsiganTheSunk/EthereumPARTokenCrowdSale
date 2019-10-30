@@ -1,6 +1,6 @@
 import React from 'react';
 
-function UnlockMetamask(props) {
+function FailToLoad(props) {
     return (
        <div className="column is-4 is-offset-4">
            <div className="notification is-danger">
@@ -11,4 +11,4 @@ function UnlockMetamask(props) {
     )
 }
 
-export default UnlockMetamask;
+export default FailToLoad;
