@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 
 // Import Crowdsale Logo
-import logo from './ETH-Icon.png'
+import logo from './images/ETH-Icon.png'
 
 // Import Crowdsale Styles
 import './App.css'
