@@ -180,6 +180,7 @@ class App extends Component {
        }
     };
 
+    // TODO: move to input.js component
     onLaunchClicked (event) {
         event.preventDefault();
         this.setState({isTransferButtonDisabled: true});
@@ -194,6 +195,7 @@ class App extends Component {
         setTimeout(() => this.setState({ isTransferButtonDisabled: false }), 1000);
     };
 
+    // TODO: move to input.js component
     myChangeHandler = (event) => {
         let nam = event.target.name;
         let val = event.target.value;
@@ -207,6 +209,7 @@ class App extends Component {
         this.setState({[nam]: val});
     };
 
+    // TODO: move to transaction.js component
     buyTokensTransaction = async (currentAmount) => {
        try {
             const {
@@ -224,11 +227,19 @@ class App extends Component {
             await mainContract.methods.buyToken(currentAmount).send({from:accounts[0]});
             await tokenContract.methods.approve(mainContractAddr, currentAmount).send({from:accounts[0]});
 
+           // var batch = new Web3.BatchRequest();
+           // batch.add(wethContract.methods.deposit().send({value: weiAmount, from:accounts[0]}));
+           // batch.add(wethContract.methods.approve(mainContractAddr, weiAmount).send({from:accounts[0]}));
+           // batch.add(mainContract.methods.buyToken(currentAmount).send({from:accounts[0]}));
+           // batch.add(tokenContract.methods.approve(mainContractAddr, currentAmount).send({from:accounts[0]}));
+           // batch.execute();
+
        } catch(err){
             console.log(err.message);
         }
     };
 
+    // TODO: move to claim.js component
     claimTokenTransaction = async () => {
         try {
             const { accounts, mainContract} = this.state;
@@ -238,6 +249,7 @@ class App extends Component {
         }
     };
 
+    // TODO: Move form to form.js component
     render() {
         if (!this.state.web3) {
             return (
@@ -249,7 +261,7 @@ class App extends Component {
             <div>
                 <Nav appName={this.appName} network={this.state.networkName} />
                 <center>
-                    <Disclaimer/>
+
                     <Account accountId={this.state.accounts[0]}/>
                     <p>
                         <WethInformation
@@ -268,7 +280,7 @@ class App extends Component {
                         <div>
                             <center>
                                 <br/>
-                                <p>Enter your desired CustomToken Amount:</p>
+                                <h1> <b>Write The  Amount & Start Contributing! </b></h1>
                                 <br/>
                                 <input type='text' name='amount' onChange={this.myChangeHandler}/>
                                 <br/>
@@ -283,7 +295,9 @@ class App extends Component {
                         </div>
                     </form>
                 </div>
-                <br/>
+                <center>
+                    <Disclaimer/>
+                </center>
             </div>
             )
     }
