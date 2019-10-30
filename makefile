@@ -6,6 +6,7 @@ TEST = truffle test
 MIGRATE = truffle migrate
 MIGRATE_RESET = --reset
 NPM_START = npm start
+APP_CLIENT = --prefix ./client
 
 compile:
 	$(COMPILE)
@@ -24,14 +25,14 @@ refresh_contracts:
 	$(CREATE_NEW_CONTRACTS_DIR)
 	$(CP_NEW_CONTRACTS)
 
+launch_client:
+	$(NPM_START) $(APP_CLIENT)
+
 all:
 	make compile
 	make hard_migrate
 	make test_contracts
 	make refresh_contracts
+	make launch_client
 
-launch_client:
-	make refresh_contracts
-	cd ./client
-	$(NPM_START)
 
