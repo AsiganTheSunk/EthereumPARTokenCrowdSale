@@ -1,0 +1,8 @@
+language: node
+cache: yarn
+dist: xenial
+install:
+  - npm install -g ganache-cli@6.6.0 && ganache-cli -d -p 8545 --defaultBalanceEther 10000 --gasLimit 10000000 -a 30 --noVMErrorsOnRPCResponse > /dev/null &
+  - travis_retry yarn install --dev
+script:
+  - truffle test
