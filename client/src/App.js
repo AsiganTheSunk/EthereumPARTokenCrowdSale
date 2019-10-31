@@ -1,9 +1,6 @@
 // Import React & React Components
 import React, { Component } from 'react'
 
-// Import Crowdsale Logo
-import logo from './images/ETH-Icon.png'
-
 // Import Crowdsale Styles
 import './App.css'
 
@@ -24,9 +21,10 @@ import TokenInformation from "./components/TokenInformation";
 import CrowdsaleInformation from "./components/CrowdsaleInformation";
 import LoadingMessage from "./components/LoadingMessage";
 import Account from "./components/Account";
+import BuyForm from "./components/BuyForm"
 
-// Unused Imports, pending implementation
-import FailToLoad from "./components/FailToLoad";
+// Import utils module
+import getNetworkName from './utils/getNerworkName'
 
 class App extends Component {
     constructor(props) {
@@ -60,51 +58,22 @@ class App extends Component {
         this.state = {
             web3: null, accounts: null,
             mainContract: null, tokenContract: null, wethContract: null,
-            mainContractAddr: null, tokenContractAddr: null,  wethContractAddr: null,
+            mainContractAddr: null, tokenContractAddr: null, wethContractAddr: null,
             networkId: null, networkName: null, time: null,
         };
-
-       this.onLaunchClicked = this.onLaunchClicked.bind(this);
-       // Bind Event for Claim Button
-       //this.onLaunchClicked = this.onLaunchClicked.bind(this);
     }
 
     // LOADING CONTRACT AND NETWORK DATA
     UNSAFE_componentWillMount() {
-        this.loadContracts();
-        this.setNetwork();
+        this.loadContractArtifacts();
+        this.loadStaticContractData();
+        const { networkId } = this.state;
+        this.setState({ networkName: getNetworkName(networkId)});
+
     };
 
-    // TODO: move to a separate utils file
-    // Method to set the Proper name to the Network
-    async setNetwork () {
-        const { networkId} = this.state;
-        var currentNetworkName = "";
-        switch (networkId) {
-            case "1":
-                currentNetworkName = " Main";
-                break;
-            case "2":
-                currentNetworkName = " Morden ";
-                break;
-            case "3":
-                currentNetworkName = " Ropsten ";
-                break;
-            case "4":
-                currentNetworkName = " Rinkeby ";
-                break;
-            case "42":
-                currentNetworkName = " Kovan ";
-                break;
-            default:
-                currentNetworkName = " Ganache ";
-        }
-        this.setState({ networkName: currentNetworkName });
-    };
-
-    // TODO: move to a separate utils file
     // Method for loading Contracts Deployed in the Network
-    async loadContracts() {
+    async loadContractArtifacts() {
         try {
             const web3 = await getWeb3();
             const accounts = await web3.eth.getAccounts();
@@ -136,7 +105,7 @@ class App extends Component {
                 mainContractAddr: deployedNetworkCrowdsale.address,
                 wethContractAddr: deployedNetworkWeth.address,
                 tokenContractAddr: deployedNetworkToken.address,
-                networkId }, this.loadStaticContractData, this.loadDynamicContractData);
+                networkId });
         } catch (err) {
             // Catch any errors for any of the above operations.
             alert(`Failed to load web3, accounts, or contract. Check console for details.`);
@@ -144,20 +113,6 @@ class App extends Component {
         }
     };
 
-    // Method for loading Dynamic Data
-    loadDynamicContractData = async () => {
-        try {
-            const { mainContract } = this.state;
-            this.crowdsaleWethSupply = await mainContract.methods.getWethTotalSupply().call();
-            this.crowdsaleTokenSupply = await mainContract.methods.getCurrentContribution().call();
-            this.crowdsaleContribution = await mainContract.methods.getTokenTotalSupply().call();
-        } catch(err) {
-            console.log(err);
-        }
-    };
-
-    // TODO: move to a separate utils file
-    // Method for loading Static Data from the Contracts
     loadStaticContractData = async () => {
         try {
             const { mainContract, tokenContract, wethContract } = this.state;
@@ -185,36 +140,6 @@ class App extends Component {
        }
     };
 
-    // TODO: move to input.js component
-    onLaunchClicked (event) {
-        event.preventDefault();
-        this.setState({isTransferButtonDisabled: true});
-        let amount = this.state.amount;
-        if (amount === '') {
-            alert("Your Invested Amount Must be more than 0");
-        }
-        if (amount !== '' && Number(amount) && amount > Number(0)) {
-            // Time Out the button to avoid over transfering funds and spam clicking (1s delay).
-            this.buyTokensTransaction(amount);
-        }
-        setTimeout(() => this.setState({ isTransferButtonDisabled: false }), 1000);
-    };
-
-    // TODO: move to input.js component
-    myChangeHandler = (event) => {
-        let nam = event.target.name;
-        let val = event.target.value;
-        let err = '';
-        if (nam === "amount") {
-            if (val !=='' && !Number(val)) {
-                err = <strong>The cuantity must be a number, more than 0</strong>;
-            }
-        }
-        this.setState({errormessage: err});
-        this.setState({[nam]: val});
-    };
-
-    // TODO: move to transaction.js component
     buyTokensTransaction = async (currentAmount) => {
        try {
             const {
@@ -224,29 +149,19 @@ class App extends Component {
             } = this.state;
 
             var weiAmount = Web3.utils.toWei(currentAmount);
-
             console.log('Current Wei Amount: ' + weiAmount);
             console.log(tokenContractAddr, wethContractAddr, mainContractAddr);
 
             await wethContract.methods.deposit().send({value: weiAmount, from:accounts[0]});
             await wethContract.methods.approve(mainContractAddr, weiAmount).send({from:accounts[0]});
-
             await mainContract.methods.buyToken(currentAmount).send({from:accounts[0]});
             await tokenContract.methods.approve(mainContractAddr, currentAmount).send({from:accounts[0]});
 
-            // TODO: does not appear to work, there is no call from metamask. CHECK MORE EXAMPLES
-            // var batch = new Web3.BatchRequest();
-            // batch.add(wethContract.methods.deposit().send({value: weiAmount, from:accounts[0]}));
-            // batch.add(wethContract.methods.approve(mainContractAddr, weiAmount).send({from:accounts[0]}));
-            // batch.add(mainContract.methods.buyToken(currentAmount).send({from:accounts[0]}));
-            // batch.add(tokenContract.methods.approve(mainContractAddr, currentAmount).send({from:accounts[0]}));
-            // batch.execute();
        } catch(err){
             console.log(err.message);
         }
     };
 
-    // TODO: move to claim.js component
     claimTokenTransaction = async () => {
         try {
             const { accounts, mainContract} = this.state;
@@ -256,15 +171,6 @@ class App extends Component {
         }
     };
 
-    // ** TIER 1: IMPLEMENTATION
-    // TODO: Add Claim Button, Close CrowdsaleButton (Debugging)
-    // TODO: Messages for Success/Failed Transactions
-
-    // ** TIER 2: IMPLEMENTATION + REFACTOR
-    // TODO: More Detailed Error on Web3, Contracts connection
-    // TODO: Move Information Block into a container component
-    // TODO: Remove Center Html5 for center style using css
-    // TODO: Move form to form.js component
     render() {
         if (!this.state.web3) {
             return (<LoadingMessage/>);
@@ -287,28 +193,12 @@ class App extends Component {
                     </p>
                 </center>
                 <div>
-                    <form onSubmit={this.mySubmitHandler}>
-                        <div>
-                            <center>
-                                <br/>
-                                <h1> <b>Write The  Amount & Start Contributing! </b></h1>
-                                <br/>
-                                <input type='text' name='amount' onChange={this.myChangeHandler}/>
-                                <br/>
-                                <br/>
-                            </center>
-                        </div>
-                        <div>
-                            <center>
-                                <input type='submit' name='transfer' onClick={this.onLaunchClicked} disabled={this.state.isTransferButtonDisabled}/>
-                                {this.state.errormessage}
-                            </center>
-                        </div>
-                    </form>
+                    <center>
+                        <BuyForm/>
+                        <br/>
+                        <Disclaimer/>
+                    </center>
                 </div>
-                <center>
-                    <Disclaimer/>
-                </center>
             </div>
             )
         }
