@@ -140,37 +140,6 @@ class App extends Component {
        }
     };
 
-    buyTokensTransaction = async (currentAmount) => {
-       try {
-            const {
-                accounts,
-                mainContract, tokenContract, wethContract,
-                wethContractAddr,  tokenContractAddr, mainContractAddr
-            } = this.state;
-
-            var weiAmount = Web3.utils.toWei(currentAmount);
-            console.log('Current Wei Amount: ' + weiAmount);
-            console.log(tokenContractAddr, wethContractAddr, mainContractAddr);
-
-            await wethContract.methods.deposit().send({value: weiAmount, from:accounts[0]});
-            await wethContract.methods.approve(mainContractAddr, weiAmount).send({from:accounts[0]});
-            await mainContract.methods.buyToken(currentAmount).send({from:accounts[0]});
-            await tokenContract.methods.approve(mainContractAddr, currentAmount).send({from:accounts[0]});
-
-       } catch(err){
-            console.log(err.message);
-        }
-    };
-
-    claimTokenTransaction = async () => {
-        try {
-            const { accounts, mainContract} = this.state;
-            await mainContract.methods.claimContribution().send({from: accounts[0]});
-        } catch(err){
-            console.log(err.message);
-        }
-    };
-
     render() {
         if (!this.state.web3) {
             return (<LoadingMessage/>);
