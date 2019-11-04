@@ -35,8 +35,8 @@ class BuyForm extends React.Component {
             console.log(tokenBuyNumber);
             // var currentWethBalance = (await mainContract.getWethTotalSupply().send({from:accounts[0]}));
             var weiAmount = Web3.utils.toWei(tokenBuyNumber.toString());
-            await tokenContract.methods.approve(mainContractAddr, tokenBuyNumber*2).send({from:accounts[0]});
-            await mainContract.methods.claimContribution().send({from: accounts[0]});
+            await tokenContract.methods.approve(mainContractAddr, tokenBuyNumber).send({'from':accounts[0]});
+            await mainContract.methods.claimContribution().send({'from': accounts[0]});
         } catch(err){
             console.log(err.message);
         }
@@ -45,7 +45,7 @@ class BuyForm extends React.Component {
     closeICO = async () => {
         try {
             const { accounts, mainContract } = this.state;
-            await mainContract.methods.closeICO().send({from: accounts[0]});
+            await mainContract.methods.closeICO().send({'from': accounts[0]});
             const crowdsaleRelease = await mainContract.methods.getReleaseTime().call();
 
             await time.increaseTo(crowdsaleRelease);
@@ -68,9 +68,9 @@ class BuyForm extends React.Component {
             console.log('+ Current Wei Amount: ' + weiAmount);
 
             // ADD RATE IN THE APPROVAL?
-            await wethContract.methods.deposit().send({value: weiAmount, from:accounts[0]});
-            await wethContract.methods.approve(mainContractAddr, weiAmount).send({from:accounts[0]});
-            await mainContract.methods.buyToken().send({from:accounts[0], value:currentAmount});
+            await wethContract.methods.deposit().send({'value': weiAmount, 'from': accounts[0]});
+            await wethContract.methods.approve(mainContractAddr, weiAmount).send({'from':accounts[0]});
+            await mainContract.methods.buyToken().send({'from':accounts[0], 'value': currentAmount});
             //await tokenContract.methods.approve(mainContractAddr, currentAmount * 2).send({from:accounts[0]});
 
             this.setState({tokenBuyNumber: currentAmount});
