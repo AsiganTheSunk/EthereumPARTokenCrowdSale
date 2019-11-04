@@ -6,7 +6,7 @@ import './App.css'
 
 // Import getWeb3Provider & Web3
 import getWeb3 from "./utils/getWeb3";
-import Web3 from 'web3';
+//import Web3 from 'web3';
 
 // Import ABI for the Smart Contracts
 import crowdsaleArtifact from "./contracts/CustomCrowdsale.json";
@@ -55,26 +55,34 @@ class App extends Component {
         this.tokenDecimals = '';
         this.tokenBalance = '';
 
+        this.wethAddr = '';
+
+        this.weth = { wethName: '', wethSymbol: '', wethDecimals: '' };
+        this.token = { tokenName: '', tokenSymbol: '', tokenDecimals: '', tokenBalance: ''};
+        this.crowdsale = {crowdsaleRate: 0, crowdsaleGoal: 0, crowdsaleCap: 0, crowdsaleStart: 0, crowdsaleClose: 0, crowdsaleRelease: 0, crowdsaleBalance:0 , crowdsaleState:false };
+
         this.state = {
             web3: null, accounts: null,
             mainContract: null, tokenContract: null, wethContract: null,
             mainContractAddr: null, tokenContractAddr: null, wethContractAddr: null,
             networkId: null, networkName: null, time: null,
+            wethData: this.weth, tokenData: this.token, crowdsaleData: this.crowdsale,
+            externalData: false
         };
     }
 
     // LOADING CONTRACT AND NETWORK DATA
-    UNSAFE_componentWillMount() {
+    componentDidMount() {
         this.loadContractArtifacts();
-        this.loadStaticContractData();
         const { networkId } = this.state;
         this.setState({ networkName: getNetworkName(networkId)});
-
     };
 
     // Method for loading Contracts Deployed in the Network
     async loadContractArtifacts() {
         try {
+            const { mainContract, tokenContract, wethContract, mainContractAddr, wethContractAddr, tokenContractAddr, wethData, tokenData, crowdsaleData } = this.state;
+
             const web3 = await getWeb3();
             const accounts = await web3.eth.getAccounts();
             const networkId = await web3.eth.net.getId();
@@ -105,72 +113,137 @@ class App extends Component {
                 mainContractAddr: deployedNetworkCrowdsale.address,
                 wethContractAddr: deployedNetworkWeth.address,
                 tokenContractAddr: deployedNetworkToken.address,
-                networkId });
+                networkId,  });
+
+            // Report Current Values
+            //console.log(crowdsaleInstance, deployedNetworkCrowdsale, deployedNetworkCrowdsale.address)
+            //console.log(wethInstance, deployedNetworkWeth, deployedNetworkWeth.address)
+            //console.log(tokenInstance, deployedNetworkToken, deployedNetworkToken.address)
         } catch (err) {
             // Catch any errors for any of the above operations.
             alert(`Failed to load web3, accounts, or contract. Check console for details.`);
             console.error(err);
         }
-    };
 
-    loadStaticContractData = async () => {
-        try {
-            const { mainContract, tokenContract, wethContract } = this.state;
-            // Get static values from the contract WETH9 to prove it was correcly loaded by Web3js
-            this.wethName = await wethContract.methods.name().call();
-            this.wethSymbol = await wethContract.methods.symbol().call();
-            this.wethDecimals = await wethContract.methods.decimals().call();
+        //TODO: Clean Up This Mess
+        const { mainContract, tokenContract, wethContract, mainContractAddr, wethContractAddr, tokenContractAddr, wethData, tokenData, crowdsaleData } = this.state;
 
-            // Get static values from the contract CustomToken to prove it was correctly loaded by Web3js
-            this.tokenBalance = await tokenContract.methods.getAmount().call();
-            this.tokenName = await tokenContract.methods.name().call();
-            this.tokenSymbol = await tokenContract.methods.symbol().call();
-            this.tokenDecimals = await tokenContract.methods.decimals().call();
+        console.log('AQUI FUCA');
+        console.log(mainContract, mainContractAddr);
+        console.log(wethContract, wethContractAddr);
+        console.log(tokenContract, tokenContractAddr);
 
-            // Get static values from the contract CustomCrowdsale to prove it was correctly loaded by Web3js
-            this.crowdsaleRate = await mainContract.methods.getRate().call();
-            this.crowdsaleCap = await mainContract.methods.getCap().call();
-            this.crowdsaleGoal = await mainContract.methods.getGoal().call();
-            this.crowdsaleStart = await mainContract.methods.getStartingTime().call(); // TODO: Change to a Proper Date Format
-            this.crowdsaleClose = await mainContract.methods.getClosingTime().call();  // TODO: Change to a Proper Date Format
-            this.crowdsaleRelease = ((await mainContract.methods.getReleaseTime().call()) - this.crowdsaleClose) / 60000;
-            this.crowdsaleState = (await mainContract.methods.isCompleted().call()).toString();
-       } catch(err) {
-            console.log(err);
-       }
+        // Get static values from the contract WETH9 to prove it was correcly loaded by Web3js
+        this.wethName = await wethContract.methods.name().call();
+        this.wethSymbol = await wethContract.methods.symbol().call();
+        this.wethDecimals = await wethContract.methods.decimals().call();
+
+        Promise.all([this.wethName, this.wethSymbol, this.wethDecimals]);
+        console.log('current state for weth data',this.wethName, this.wethSymbol, this.wethDecimals);
+
+        // Get static values from the contract CustomToken to prove it was correctly loaded by Web3js
+        this.tokenName = await tokenContract.methods.name().call();
+        this.tokenSymbol = await tokenContract.methods.symbol().call();
+        this.tokenDecimals = await tokenContract.methods.decimals().call();
+        this.tokenBalance = await tokenContract.methods.getAmount().call();
+        Promise.all([this.tokenName, this.tokenSymbol, this.tokenDecimals, this.tokenBalance]);
+        console.log('current state for token data',this.tokenName, this.tokenSymbol, this.tokenDecimals, this.tokenBalance);
+
+        // Get static values from the contract CustomCrowdsale to prove it was correctly loaded by Web3js
+        this.crowdsaleRate = await mainContract.methods.getRate().call();
+        this.crowdsaleCap = await mainContract.methods.getCap().call();
+        this.crowdsaleGoal = await mainContract.methods.getGoal().call();
+        this.crowdsaleStart = await mainContract.methods.getStartingTime().call(); // TODO: Change to a Proper Date Format
+        this.crowdsaleClose = await mainContract.methods.getClosingTime().call();  // TODO: Change to a Proper Date Format
+        this.crowdsaleRelease = ((await mainContract.methods.getReleaseTime().call()) - this.crowdsaleClose) / 60000;
+        this.crowdsaleState = (await mainContract.methods.isCompleted().call()).toString();
+
+        Promise.all([this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState]);
+        console.log('current state for crowdsale data', this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState);
+
+        wethData.wethName = this.wethName;
+        wethData.wethSymbol = this.wethSymbol;
+        wethData.wethDecimals =  this.wethDecimals;
+
+        tokenData.tokenName = this.tokenName;
+        tokenData.tokenSymbol = this.tokenSymbol;
+        tokenData.tokenDecimals = this.tokenDecimals;
+        tokenData.tokenBalance = this.tokenBalance;
+
+        crowdsaleData.crowdsaleRate = this.crowdsaleRate;
+        crowdsaleData.crowdsaleCap = this.crowdsaleCap;
+        crowdsaleData.crowdsaleGoal = this.crowdsaleGoal;
+        crowdsaleData.crowdsaleStart = this.crowdsaleStart; // TODO: Change to a Proper Date Format
+        crowdsaleData.crowdsaleClose = this.crowdsaleClose;  // TODO: Change to a Proper Date Format
+        crowdsaleData.crowdsaleRelease = this.crowdsaleRelease;
+        crowdsaleData.crowdsaleState = this.crowdsaleState;
+
+        this.setState({ mainContract, tokenContract, wethContract, mainContractAddr, wethContractAddr, tokenContractAddr, wethData, tokenData, crowdsaleData });
+        return this.state;
     };
 
     render() {
         if (!this.state.web3) {
             return (<LoadingMessage/>);
         }
+        //if (this.state.externalData !== false) {
         return (
             <div>
                 <Nav appName={this.appName} network={this.state.networkName} />
+
                 <center>
                     <Account accountId={this.state.accounts[0]}/>
                     <p>
                         <WethInformation
-                            wethName={this.wethName} wethSymbol={this.wethSymbol} wethDecimals={this.wethDecimals} />
+                            wethName={this.wethName}
+                            wethSymbol={this.wethSymbol}
+                            wethDecimals={this.wethDecimals}
+                        />
                         <TokenInformation
-                            tokenName={this.tokenName} tokenSymbol={this.tokenSymbol}
-                            tokenDecimals={this.tokenDecimals} tokenBalance={this.tokenBalance} />
-                        <CrowdsaleInformation crowdsaleRate={this.crowdsaleRate} crowdsaleCap={this.crowdsaleCap}
-                                              crowdsaleGoal={this.crowdsaleGoal} crowdsaleBalance={this.crowdsaleBalance}
-                                              crowdsaleStart={this.crowdsaleStart} crowdsaleClose={this.crowdsaleClose}
-                                              crowdsaleRelease={this.crowdsaleRelease} crowdsaleState={this.crowdsaleState} />
+                            tokenName={this.tokenName}
+                            tokenSymbol={this.tokenSymbol}
+                            tokenDecimals={this.tokenDecimals}
+                            tokenBalance={this.tokenBalance}
+                        />
+                        <CrowdsaleInformation
+                            crowdsaleRate={this.crowdsaleRate}
+                            crowdsaleCap={this.crowdsaleCap}
+                            crowdsaleGoal={this.crowdsaleGoal}
+                            crowdsaleBalance={this.crowdsaleBalance}
+                            crowdsaleStart={this.crowdsaleStart}
+                            crowdsaleClose={this.crowdsaleClose}
+                            crowdsaleRelease={this.crowdsaleRelease}
+                            crowdsaleState={this.crowdsaleState}
+                        />
                     </p>
                 </center>
                 <div>
                     <center>
-                        <BuyForm/>
+                        <BuyForm
+                            accounts={this.state.accounts}
+                            mainContract={this.state.mainContract}
+                            mainContractAddr={this.state.mainContractAddr}
+                            tokenContract={this.state.tokenContract}
+                            tokenContractAddr={this.state.tokenContractAddr}
+                            wethContract={this.state.wethContract}
+                            wethContractAddr={this.state.wethContractAddr}
+                        />
                         <br/>
                         <Disclaimer/>
+                        <p>
+                            Weth Contract Addr: {this.state.wethContractAddr}
+                            <br/>
+                            Token Contract Addr: {this.state.tokenContractAddr}
+                            <br/>
+                            Crowdsale Contract Addr: {this.state.mainContractAddr}
+                        </p>
                     </center>
                 </div>
+
             </div>
             )
         }
+    //}
 };
 
 export default App;

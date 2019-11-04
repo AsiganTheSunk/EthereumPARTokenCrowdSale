@@ -67,6 +67,7 @@ contract CustomToken is ERC20Detailed, Ownable {
         return true;
     }
 
+    // getAmount Init CustomTokens from the contract
     function getAmount() public view returns(uint) {
         return amount;
     }
