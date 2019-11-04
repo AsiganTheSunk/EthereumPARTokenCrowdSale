@@ -26,6 +26,8 @@ import BuyForm from "./components/BuyForm"
 // Import utils module
 import getNetworkName from './utils/getNerworkName'
 
+
+
 class App extends Component {
     constructor(props) {
         super(props);
@@ -232,7 +234,6 @@ class App extends Component {
                         </p>
                     </center>
                 </div>
-
             </div>
             )
         }

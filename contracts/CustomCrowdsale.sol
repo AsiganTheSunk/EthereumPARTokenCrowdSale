@@ -121,6 +121,7 @@ contract CustomCrowdsale is Ownable {
         // If the current buy does not exceed the cap but overreaches the actual contributionGoal, the tokens left would be sold instead
         if (aux > contributionGoal) {
             _contribution = contributionGoal.sub(currentContribution);
+            ICOGoalReached = true;
         }
         // Requirement transferForm must be successful
         require(weth9.transferFrom(msg.sender, address(this), _contribution), "transferFrom() Wether has Failed");

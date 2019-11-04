@@ -25,9 +25,7 @@ class BuyForm extends React.Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleCloseClick = this.handleCloseClick.bind(this);
         this.handleBuyClick = this.handleBuyClick.bind(this);
-        this.handleBatchBuyClick = this.handleBatchBuyClick.bind(this);
         this.handleClaimClick = this.handleClaimClick.bind(this);
-        this.handleBatchClaimClick = this.handleBatchClaimClick.bind(this);
     }
 
     claimTokenTransaction = async () => {
@@ -43,6 +41,9 @@ class BuyForm extends React.Component {
         try {
             const { accounts, mainContract } = this.state;
             await mainContract.methods.closeICO().send({from: accounts[0]});
+            const crowdsaleRelease = await mainContract.methods.getReleaseTime().call();
+            const { time } = require('@openzeppelin/test-helpers');
+            await time.increaseTo(crowdsaleRelease);
         } catch(err){
             console.log(err.message);
         }
@@ -72,27 +73,6 @@ class BuyForm extends React.Component {
             console.log(err.message);
         }
     };
-
-    buyBatchTokensTransaction = (currentAmount) => {
-        try {
-            const { accounts, mainContract, tokenContract, wethContract, mainContractAddr } = this.state;
-
-            var weiAmount = Web3.utils.toWei(currentAmount.toString());
-            console.log('+ Current Wei Amount: ' + weiAmount);
-
-            var web3 = new Web3();
-            var batch = new web3.BatchRequest();
-            batch.add(wethContract.methods.deposit().call.request({value: weiAmount, from:accounts[0]}));
-            batch.add(wethContract.methods.approve(mainContractAddr, weiAmount).call.request({from:accounts[0]}));
-            //batch.add(mainContract.methods.buyToken(currentAmount).request({from:accounts[0]}));
-            //batch.add(tokenContract.methods.approve(mainContractAddr, currentAmount).request({from:accounts[0]}));
-            batch.execute();
-        } catch(err){
-            console.log('Batch Operation Buy Tokens Crashed!!');
-            console.log(err.message);
-        }
-    };
-
 
     handleChange = (event) => {
         event.preventDefault();
@@ -132,28 +112,10 @@ class BuyForm extends React.Component {
         }
     }
 
-    // Handle Batch Click Operations
-    handleBatchBuyClick(event) {
-        event.preventDefault();
-        const { currentValue } = this.state;
-        try {
-            console.log('BATCH OPERATION');
-            this.buyBatchTokensTransaction(currentValue);
-        } catch(err) {
-            console.log(err);
-        }
-    }
-
     // Handle Claim Click Operations
     handleClaimClick(event) {
         event.preventDefault();
         this.claimTokenTransaction();
-    }
-
-    // Handle Claim Click Operations
-    handleBatchClaimClick(event) {
-        event.preventDefault();
-        //this.claimTokenTransaction();
     }
 
     render() {
@@ -174,9 +136,7 @@ class BuyForm extends React.Component {
                 </form>
                 <center>
                     <button style= {input_style} disabled={this.state.isBuyButtonDisabled} onClick={this.handleBuyClick}> Buy (Single-Tx) </button>
-                    <button style= {input_style} disabled={this.state.isBuyButtonDisabled} onClick={this.handleBatchBuyClick}> Buy (Batch-Tx) </button>
                     <button style= {input_style} disabled={this.state.isBuyButtonDisabled} onClick={this.handleClaimClick}> Claim (Single-Tx) </button>
-                    <button style= {input_style} disabled={this.state.isBuyButtonDisabled} onClick={this.handleBatchClaimClick}> Claim (Batch-Tx) </button>
                     <button style= {input_style} disabled={this.state.isBuyButtonDisabled} onClick={this.handleCloseClick}> Close Crowdsale (Debug) </button>
                     <br/>
                    {this.state.errorMessage}
