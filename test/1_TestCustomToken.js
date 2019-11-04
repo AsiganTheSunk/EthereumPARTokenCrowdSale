@@ -93,23 +93,18 @@ contract('CustomToken', (accounts) => {
         try {
             // Await Deployment of the Smart Contract
             var myCustomTokenInstance = await myToken.deployed();
+            var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
 
             // Default values for the accounts making the operations
-            var accountOne = accounts[0];
             var accountTwo = accounts[1];
 
-            // Retrieve initial balances from accountOne and accountTwo.
-            var accountOneStartingBalance = (await myCustomTokenInstance.getBalance.call(accountOne)).toNumber();
-            console.log(accountOneStartingBalance);
-
-            var accountTwoStartingBalance = (await myCustomTokenInstance.getBalance.call(accountTwo)).toNumber();
-            console.log(accountTwoStartingBalance);
             // Perfom Transaction from accountOne to accountTwo.
             var amount = 999999999999999999999999;
+            //await myCustomTokenInstance.approve();
             await myCustomTokenInstance.transfer(accountTwo, amount);
-        } catch (error) {
-            console.log(err.message);
-            //assert.equal(error.message, 'Returned error: VM Exception while processing transaction: revert', "This Contract is vulnerable to OverFlow Attacks");
+        } catch (err) {
+            //console.log(err.message);
+            assert.equal(err.message, 'invalid number value (arg="_amount", coderType="uint256", value=1e+24)', "This Contract is vulnerable to OverFlow Attacks");
         }
     });
 
@@ -132,9 +127,9 @@ contract('CustomToken', (accounts) => {
             // Perform Transaction from accountOne to accountTwo.
             var amount = -10000;
             await myCustomTokenInstance.transfer(accountTwo, amount);
-        } catch (error) {
-            console.log(err.message);
-            //assert.equal(error.message, 'Returned error: VM Exception while processing transaction: revert', "This Contract is vulnerable to UnderFlow Attacks");
+        } catch (err) {
+            //console.log(err.message);
+            assert.equal(err.message, 'Returned error: VM Exception while processing transaction: revert', "This Contract is vulnerable to UnderFlow Attacks");
         }
     });
 });

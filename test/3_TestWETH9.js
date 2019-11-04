@@ -81,7 +81,7 @@ contract('WETH9', (accounts) => {
             // Perfom a deposit of the malicious amount
             await myWeth9Instance.deposit({'value': malicious_amount});
         } catch (err) {
-            console.log(err.message);
+            console.log('       # ', err.message);
             //assert.equal(err.message, 'Returned error: VM Exception while processing transaction: revert Not enough Ether to Withdraw!! -- Reason given: Not enough Ether to Withdraw!!.', "This Contract is vulnerable to OverFlow Attacks");
         }
     });
@@ -106,8 +106,8 @@ contract('WETH9', (accounts) => {
             // Perfom a withdraw of the malicious amount
             await myWeth9Instance.withdraw(malicious_amount);
         } catch (err) {
-            console.log(err.message);
-            //assert.equal(err.message, 'Returned error: VM Exception while processing transaction: revert', 'This Contract is vulnerable to Withdraw more that Deposit');
+            //console.log(err.message);
+            assert.equal(err.message, 'Returned error: VM Exception while processing transaction: revert', 'This Contract is vulnerable to Withdraw more that Deposit');
         }
     });
 
@@ -128,6 +128,7 @@ contract('WETH9', (accounts) => {
             // Retrieve the current amount of totalSupply()
             var currentBalance = new BN(await myWeth9Instance.totalSupply());
         } catch (err) {
+            //console.log(err.message);
             assert.equal(err.message, 'Returned error: VM Exception while processing transaction: revert', 'This Contract is vulnerable to UnderFlow Attacks');
         }
     });
@@ -149,6 +150,7 @@ contract('WETH9', (accounts) => {
             // Perfom a withdraw of the malicious amount
             await myWeth9Instance.withdraw(amount);
         } catch (err) {
+            //console.log(err.message);
             assert.equal(err.message, 'Returned error: VM Exception while processing transaction: revert', 'This Contract is vulnerable to UnderFlow Attacks');
         }
     });
