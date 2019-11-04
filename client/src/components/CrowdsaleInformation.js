@@ -2,7 +2,7 @@ import React from 'react';
 
 function CrowdsaleInformation(props) {
     return (
-        <p>
+        <div>
             <br/>
             <b> [ Crowdsale Information ] </b>
             <br/>
@@ -12,7 +12,7 @@ function CrowdsaleInformation(props) {
             <br/>
             <b> Status(isClosed): </b> {props.crowdsaleState}
             <br/>
-        </p>
+        </div>
     )
 };
 

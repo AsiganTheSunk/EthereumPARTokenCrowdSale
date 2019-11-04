@@ -148,8 +148,7 @@ class App extends Component {
         this.crowdsaleStart = await mainContract.methods.getStartingTime().call(); // TODO: Change to a Proper Date Format
         this.crowdsaleClose = await mainContract.methods.getClosingTime().call();  // TODO: Change to a Proper Date Format
         this.crowdsaleRelease = ((await mainContract.methods.getReleaseTime().call()) - this.crowdsaleClose) / 60000;
-        // This line doing rejection!
-        this.crowdsaleState = (await mainContract.methods.isCompleted().call()).toString();
+        this.crowdsaleState = (await mainContract.methods.isCompleted().call()).toString(); // TODO: bug in this line, rejection when doing this from fresh install !!
 
         Promise.all([this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState]);
         console.log('current state for crowdsale data', this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState);
@@ -189,7 +188,7 @@ class App extends Component {
 
                 <center>
                     <Account accountId={this.state.accounts[0]}/>
-                    <p>
+                    <div>
                         <WethInformation
                             wethName={this.wethName}
                             wethSymbol={this.wethSymbol}
@@ -211,7 +210,7 @@ class App extends Component {
                             crowdsaleRelease={this.crowdsaleRelease}
                             crowdsaleState={this.crowdsaleState}
                         />
-                    </p>
+                    </div>
                 </center>
                 <div>
                     <center>
