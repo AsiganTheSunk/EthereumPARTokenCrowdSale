@@ -148,6 +148,7 @@ class App extends Component {
         this.crowdsaleStart = await mainContract.methods.getStartingTime().call(); // TODO: Change to a Proper Date Format
         this.crowdsaleClose = await mainContract.methods.getClosingTime().call();  // TODO: Change to a Proper Date Format
         this.crowdsaleRelease = ((await mainContract.methods.getReleaseTime().call()) - this.crowdsaleClose) / 60000;
+        // This line doing rejection!
         this.crowdsaleState = (await mainContract.methods.isCompleted().call()).toString();
 
         Promise.all([this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState]);

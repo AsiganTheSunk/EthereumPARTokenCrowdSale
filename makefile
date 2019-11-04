@@ -7,6 +7,7 @@ MIGRATE = truffle migrate
 MIGRATE_RESET = --reset
 NPM_START = npm start
 APP_CLIENT = --prefix ./client
+NPM_INSTALL = ./bin/install-travis.sh
 
 compile:
 	$(COMPILE)
@@ -27,6 +28,9 @@ refresh_contracts:
 
 launch_client:
 	$(NPM_START) $(APP_CLIENT)
+
+install:
+	$(NPM_INSTALL)
 
 all:
 	make compile

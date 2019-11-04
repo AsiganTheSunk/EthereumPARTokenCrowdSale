@@ -13585,12 +13585,216 @@
         }
       },
       "links": {},
-      "address": "0x9C399f8bb6FE1BC583801c7C92A315908945BeCC",
-      "transactionHash": "0x3c938696ebc41b48ed3546e4ff1c6bd01582b91a29041b9249ebbb31d3091afc"
+      "address": "0x91e5B105b88E155C67d01A5fF7eDb02CcD46044e",
+      "transactionHash": "0x2987a6ede3709183e944170aa16daf66df9db45bc5d8538e24f66343ce27e1ac"
+    },
+    "1572876024891": {
+      "events": {
+        "0x4d154d4aae216bed6d0926db77c00df2b57c6b5ba4eee05775de20facede3a7b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "_from",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "Contribution",
+          "type": "event",
+          "signature": "0x4d154d4aae216bed6d0926db77c00df2b57c6b5ba4eee05775de20facede3a7b"
+        },
+        "0xe2cacd9696795caa2d3fe049b4533489e66bc98a6a944ae76bfbb2d1de4d07b7": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "_from",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "ClaimContribution",
+          "type": "event",
+          "signature": "0xe2cacd9696795caa2d3fe049b4533489e66bc98a6a944ae76bfbb2d1de4d07b7"
+        },
+        "0xa335a1c1060ac25caf36b1623df502a6074f517189c942acb1a81176401ea9a1": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "_from",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "time",
+              "type": "uint256"
+            }
+          ],
+          "name": "CloseCrowdsale",
+          "type": "event",
+          "signature": "0xa335a1c1060ac25caf36b1623df502a6074f517189c942acb1a81176401ea9a1"
+        },
+        "0x01010b5d6c025d0c4cb16706a796168f588300bca2bac066816f536f2c4ceb0d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "_sender",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_claimedTokens",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "_balance",
+              "type": "uint256"
+            }
+          ],
+          "name": "claimContributionPreTx",
+          "type": "event",
+          "signature": "0x01010b5d6c025d0c4cb16706a796168f588300bca2bac066816f536f2c4ceb0d"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event",
+          "signature": "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+        }
+      },
+      "links": {},
+      "address": "0xd20c03aB2B16b8cFAcD06bD2F7ED48D27F3CE0AA",
+      "transactionHash": "0xde64f15f2d461e4f6d373b7da20312ba2782df610c4f879548a7d5ec1835e27f"
+    },
+    "1572877020242": {
+      "events": {
+        "0x4d154d4aae216bed6d0926db77c00df2b57c6b5ba4eee05775de20facede3a7b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "_from",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "Contribution",
+          "type": "event",
+          "signature": "0x4d154d4aae216bed6d0926db77c00df2b57c6b5ba4eee05775de20facede3a7b"
+        },
+        "0xe2cacd9696795caa2d3fe049b4533489e66bc98a6a944ae76bfbb2d1de4d07b7": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "_from",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "ClaimContribution",
+          "type": "event",
+          "signature": "0xe2cacd9696795caa2d3fe049b4533489e66bc98a6a944ae76bfbb2d1de4d07b7"
+        },
+        "0xa335a1c1060ac25caf36b1623df502a6074f517189c942acb1a81176401ea9a1": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "_from",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "time",
+              "type": "uint256"
+            }
+          ],
+          "name": "CloseCrowdsale",
+          "type": "event",
+          "signature": "0xa335a1c1060ac25caf36b1623df502a6074f517189c942acb1a81176401ea9a1"
+        },
+        "0x01010b5d6c025d0c4cb16706a796168f588300bca2bac066816f536f2c4ceb0d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "_sender",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_claimedTokens",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "_balance",
+              "type": "uint256"
+            }
+          ],
+          "name": "claimContributionPreTx",
+          "type": "event",
+          "signature": "0x01010b5d6c025d0c4cb16706a796168f588300bca2bac066816f536f2c4ceb0d"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event",
+          "signature": "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+        }
+      },
+      "links": {},
+      "address": "0x03679dD50aC7112bc4C056aB1Ea5aFC344B25d1F",
+      "transactionHash": "0x8c3f17ad2cb6c2c280f936f1551f35fee4bb39c62cadd5dd62e0e7c6a0f3b29e"
     }
   },
   "schemaVersion": "3.0.16",
-  "updatedAt": "2019-11-04T13:39:03.894Z",
+  "updatedAt": "2019-11-04T14:20:00.216Z",
   "devdoc": {
     "methods": {
       "isOwner()": {
