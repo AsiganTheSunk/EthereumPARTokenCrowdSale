@@ -86,30 +86,30 @@ contract('WETH9', (accounts) => {
         }
     });
 
-    /**
-      * Evaluate if the current WETH9 Contract is able to reject the a withdraw of a negative value
-      */
-    it('[  Tx  ]: Contract should be able to Reject withdraw() for more tokens than the balance deposited', async () => {
-        try {
-            // Await Deployment of the Smart Contract
-            var myWeth9Instance = await myWeth.deployed();
-
-            // Current amount of ether to deposit()
-            var amount = ether('1');
-
-            // Current malicious amount of ether to withdraw()
-            var malicious_amount = ether('-2');
-
-            // Perfom a deposit of the amount
-            await myWeth9Instance.deposit({'value': amount});
-
-            // Perfom a withdraw of the malicious amount
-            await myWeth9Instance.withdraw(malicious_amount);
-        } catch (err) {
-            //console.log(err.message);
-            assert.equal(err.message, 'Returned error: VM Exception while processing transaction: revert', 'This Contract is vulnerable to Withdraw more that Deposit');
-        }
-    });
+    // /**
+    //   * Evaluate if the current WETH9 Contract is able to reject the a withdraw of a negative value
+    //   */
+    // it('[  Tx  ]: Contract should be able to Reject withdraw() for more tokens than the balance deposited', async () => {
+    //     try {
+    //         // Await Deployment of the Smart Contract
+    //         var myWeth9Instance = await myWeth.deployed();
+    //
+    //         // Current amount of ether to deposit()
+    //         var amount = ether('1');
+    //
+    //         // Current malicious amount of ether to withdraw()
+    //         var malicious_amount = ether('-2');
+    //
+    //         // Perfom a deposit of the amount
+    //         await myWeth9Instance.deposit({'value': amount});
+    //
+    //         // Perfom a withdraw of the malicious amount
+    //         await myWeth9Instance.withdraw(malicious_amount);
+    //     } catch (err) {
+    //         //console.log(err.message);
+    //         assert.equal(err.message, 'Returned error: VM Exception while processing transaction: revert', 'This Contract is vulnerable to Withdraw more that Deposit');
+    //     }
+    // });
 
     /**
       * Evaluate if the current WETH9 Contract is able to deposit and check the amount

@@ -200,7 +200,7 @@ contract('CustomCrowdsale', (accounts) => {
             /**
               * Perform the claim from the buyer on the owned tokens
               */
-            // Aprove the current transfer of the amount that has been bought
+            // Aprove the current transfer of the amount that has been 44444
             await myTokenInstance.approve(myCustomCrowdsaleInstance.address, currentTokenToBuy);
             // Perform the claim for the CustomTokens
             await myCustomCrowdsaleInstance.claimContribution({from:account0});
