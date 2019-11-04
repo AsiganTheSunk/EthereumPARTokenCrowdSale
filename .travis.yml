@@ -20,7 +20,7 @@ matrix:
         - rm -rf node_modules
 
 install:
-  - bash ./bin/travis-install.sh
+  - bash ./bin/install-travis.sh
 
 script:
-  - bash ./bin/test.sh
+  - bash ./bin/test-contract-travis.sh
