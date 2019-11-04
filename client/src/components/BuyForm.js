@@ -32,12 +32,10 @@ class BuyForm extends React.Component {
     claimTokenTransaction = async () => {
         try {
             const { accounts, mainContract, tokenContract, mainContractAddr, tokenBuyNumber } = this.state;
-            console.log(tokenBuyNumber)
-            // const aux_variable = await mainContract.methods.getTokenTotalSupplyFrom().send({from:accounts[0]});
-            var currentWethBalance = (await mainContract.getWethTotalSupply().send({from:accounts[0]}));
-            //Promise.all([aux_variable2]);
-            console.log('current aux_variable: ', currentWethBalance);
-            await tokenContract.methods.approve(mainContractAddr, tokenBuyNumber).send({from:accounts[0]});
+            console.log(tokenBuyNumber);
+            // var currentWethBalance = (await mainContract.getWethTotalSupply().send({from:accounts[0]}));
+            var weiAmount = Web3.utils.toWei(tokenBuyNumber.toString());
+            await tokenContract.methods.approve(mainContractAddr, tokenBuyNumber*2).send({from:accounts[0]});
             await mainContract.methods.claimContribution().send({from: accounts[0]});
         } catch(err){
             console.log(err.message);
@@ -58,8 +56,7 @@ class BuyForm extends React.Component {
 
     buySingleTokensTransaction = async (currentAmount) => {
         try {
-            const { accounts, mainContract, tokenContract, wethContract,
-                wethContractAddr, tokenContractAddr, mainContractAddr } = this.state;
+            const { accounts, mainContract, tokenContract, wethContract, mainContractAddr } = this.state;
 
             console.log('Current Contract Data');
             console.log('--------------------------------------------------');
@@ -70,10 +67,11 @@ class BuyForm extends React.Component {
             var weiAmount = Web3.utils.toWei(currentAmount.toString());
             console.log('+ Current Wei Amount: ' + weiAmount);
 
+            // ADD RATE IN THE APPROVAL?
             await wethContract.methods.deposit().send({value: weiAmount, from:accounts[0]});
             await wethContract.methods.approve(mainContractAddr, weiAmount).send({from:accounts[0]});
-            await mainContract.methods.buyToken(currentAmount).send({from:accounts[0]});
-            await tokenContract.methods.approve(mainContractAddr, currentAmount).send({from:accounts[0]});
+            await mainContract.methods.buyToken().send({from:accounts[0], value:currentAmount});
+            //await tokenContract.methods.approve(mainContractAddr, currentAmount * 2).send({from:accounts[0]});
 
             this.setState({tokenBuyNumber: currentAmount});
         } catch(err){

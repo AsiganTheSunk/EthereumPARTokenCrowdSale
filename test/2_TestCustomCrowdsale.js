@@ -136,7 +136,7 @@ contract('CustomCrowdsale', (accounts) => {
             // Current Amount of CustomToken to buy in the CustomCrowdsale by the current buyer
             var currentTokenToBuy = 5;
             // Perform a buy of the previous defined amount
-            await myCustomCrowdsaleInstance.buyToken(currentTokenToBuy, {from:account0});
+            await myCustomCrowdsaleInstance.buyToken({'from': account0, 'value': currentTokenToBuy});
 
             try {
                 /**
@@ -145,7 +145,7 @@ contract('CustomCrowdsale', (accounts) => {
                 // Aprove the current transfer of the amount that has been bought
                 await myTokenInstance.approve(myCustomCrowdsaleInstance.address, currentTokenToBuy);
                 // Perform the claim for the CustomTokens
-                await myCustomCrowdsaleInstance.claimContribution({from:account0});
+                await myCustomCrowdsaleInstance.claimContribution({'from':account0});
 
             } catch(err) {
                 console.log('       +  Perform the claim from the buyer on the owned tokens without the time contraint/closed ICO being met');

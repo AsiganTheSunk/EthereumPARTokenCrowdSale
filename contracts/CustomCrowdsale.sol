@@ -105,9 +105,13 @@ contract CustomCrowdsale is Ownable {
     }
 
     // hace falta añadir una funcion de fallback para poder cambiar imagino el msg.sender cuando se llama a la funcion.
+    function() external payable {
+        buyToken();
+    }
 
     // Buy Funtion for the CustomCrowdsale
-    function buyToken(uint256 _contribution) public returns (bool) {
+    function buyToken() public payable returns (bool) {
+        uint256 _contribution = msg.value;
         // Requirement contribution must be less than the Cap
         require(_contribution < cap, 'CustomCrowdsaled buyToken() has exceed the cap');
         // Requirement currentContribution must be less than the contributionGoal
@@ -140,7 +144,8 @@ contract CustomCrowdsale is Ownable {
         emit claimContributionPreTx(msg.sender, claimedTokens, contributions[msg.sender]);
         if(contributions[msg.sender] != 0) {
             // Requirement transfer must be successful
-            require(token.transfer(msg.sender, claimedTokens), "transfer() CustomTokens has Failed");
+            //require(token.transfer(msg.sender, claimedTokens), "transfer() CustomTokens has Failed");
+            require(token.transferFrom(address(this), msg.sender, claimedTokens), "transferFrom() CTC has Failed");
             // Emit Current Status Post Claim
             emit ClaimContribution(msg.sender, claimedTokens);
             // Set the contribution of the sender to 0
@@ -159,9 +164,11 @@ contract CustomCrowdsale is Ownable {
         return token.totalSupply();
     }
 
-    function getTokenTotalSupplyFrom() public view returns(uint256) {
-        return contributions[msg.sender];
+    function getTokenToClaim(address contributor) public view returns(uint256) {
+        return contributions[contributor] * rate;
     }
+
+
     // Total WETH9 held in the CustomCrowdsale
     function getWethTotalSupply() public view returns (uint256) {
         return weth9.totalSupply();
