@@ -55,8 +55,6 @@ class App extends Component {
         this.tokenDecimals = '';
         this.tokenBalance = '';
 
-        this.wethAddr = '';
-
         this.weth = { wethName: '', wethSymbol: '', wethDecimals: '' };
         this.token = { tokenName: '', tokenSymbol: '', tokenDecimals: '', tokenBalance: ''};
         this.crowdsale = {crowdsaleRate: 0, crowdsaleGoal: 0, crowdsaleCap: 0, crowdsaleStart: 0, crowdsaleClose: 0, crowdsaleRelease: 0, crowdsaleBalance:0 , crowdsaleState:false };
@@ -81,8 +79,6 @@ class App extends Component {
     // Method for loading Contracts Deployed in the Network
     async loadContractArtifacts() {
         try {
-            const { mainContract, tokenContract, wethContract, mainContractAddr, wethContractAddr, tokenContractAddr, wethData, tokenData, crowdsaleData } = this.state;
-
             const web3 = await getWeb3();
             const accounts = await web3.eth.getAccounts();
             const networkId = await web3.eth.net.getId();
@@ -114,11 +110,6 @@ class App extends Component {
                 wethContractAddr: deployedNetworkWeth.address,
                 tokenContractAddr: deployedNetworkToken.address,
                 networkId,  });
-
-            // Report Current Values
-            //console.log(crowdsaleInstance, deployedNetworkCrowdsale, deployedNetworkCrowdsale.address)
-            //console.log(wethInstance, deployedNetworkWeth, deployedNetworkWeth.address)
-            //console.log(tokenInstance, deployedNetworkToken, deployedNetworkToken.address)
         } catch (err) {
             // Catch any errors for any of the above operations.
             alert(`Failed to load web3, accounts, or contract. Check console for details.`);
@@ -126,12 +117,11 @@ class App extends Component {
         }
 
         //TODO: Clean Up This Mess
-        const { mainContract, tokenContract, wethContract, mainContractAddr, wethContractAddr, tokenContractAddr, wethData, tokenData, crowdsaleData } = this.state;
-
-        console.log('AQUI FUCA');
-        console.log(mainContract, mainContractAddr);
-        console.log(wethContract, wethContractAddr);
-        console.log(tokenContract, tokenContractAddr);
+        const {
+            mainContract, tokenContract,
+            wethContract, mainContractAddr, wethContractAddr,
+            tokenContractAddr, wethData, tokenData, crowdsaleData
+        } = this.state;
 
         // Get static values from the contract WETH9 to prove it was correcly loaded by Web3js
         this.wethName = await wethContract.methods.name().call();
@@ -161,6 +151,7 @@ class App extends Component {
         Promise.all([this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState]);
         console.log('current state for crowdsale data', this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState);
 
+        // Save Current Status of the Contracts in state objects.
         wethData.wethName = this.wethName;
         wethData.wethSymbol = this.wethSymbol;
         wethData.wethDecimals =  this.wethDecimals;
@@ -173,12 +164,15 @@ class App extends Component {
         crowdsaleData.crowdsaleRate = this.crowdsaleRate;
         crowdsaleData.crowdsaleCap = this.crowdsaleCap;
         crowdsaleData.crowdsaleGoal = this.crowdsaleGoal;
-        crowdsaleData.crowdsaleStart = this.crowdsaleStart; // TODO: Change to a Proper Date Format
-        crowdsaleData.crowdsaleClose = this.crowdsaleClose;  // TODO: Change to a Proper Date Format
+        crowdsaleData.crowdsaleStart = this.crowdsaleStart;
+        crowdsaleData.crowdsaleClose = this.crowdsaleClose;
         crowdsaleData.crowdsaleRelease = this.crowdsaleRelease;
         crowdsaleData.crowdsaleState = this.crowdsaleState;
 
-        this.setState({ mainContract, tokenContract, wethContract, mainContractAddr, wethContractAddr, tokenContractAddr, wethData, tokenData, crowdsaleData });
+        this.setState({
+            mainContract, tokenContract, wethContract,
+            mainContractAddr, wethContractAddr, tokenContractAddr,
+            wethData, tokenData, crowdsaleData });
         return this.state;
     };
 
@@ -186,7 +180,6 @@ class App extends Component {
         if (!this.state.web3) {
             return (<LoadingMessage/>);
         }
-        //if (this.state.externalData !== false) {
         return (
             <div>
                 <Nav appName={this.appName} network={this.state.networkName} />
@@ -231,11 +224,11 @@ class App extends Component {
                         <br/>
                         <Disclaimer/>
                         <p>
-                            Weth Contract Addr: {this.state.wethContractAddr}
+                            <b> [ Weth Contract Addr ]: </b> {this.state.wethContractAddr}
                             <br/>
-                            Token Contract Addr: {this.state.tokenContractAddr}
+                            <b> [ Token Contract Addr ]: </b> {this.state.tokenContractAddr}
                             <br/>
-                            Crowdsale Contract Addr: {this.state.mainContractAddr}
+                            <b>[ Crowdsale Contract Addr ]: </b> {this.state.mainContractAddr}
                         </p>
                     </center>
                 </div>
@@ -243,7 +236,6 @@ class App extends Component {
             </div>
             )
         }
-    //}
 };
 
 export default App;
