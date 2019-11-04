@@ -19,7 +19,7 @@ class BuyForm extends React.Component {
             wethContract: this.props.wethContract,
             wethContractAddr: this.props.wethContractAddr,
 
-            currentValue: 0
+            currentValue: 0, tokenBuyNumber:0
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -30,7 +30,9 @@ class BuyForm extends React.Component {
 
     claimTokenTransaction = async () => {
         try {
-            const { accounts, mainContract } = this.state;
+            const { accounts, mainContract, tokenContract, mainContractAddr, tokenBuyNumber } = this.state;
+            console.log(tokenBuyNumber);
+            await tokenContract.methods.approve(mainContractAddr, tokenBuyNumber).send({from:accounts[0]});
             await mainContract.methods.claimContribution().send({from: accounts[0]});
         } catch(err){
             console.log(err.message);
@@ -68,6 +70,7 @@ class BuyForm extends React.Component {
             await mainContract.methods.buyToken(currentAmount).send({from:accounts[0]});
             await tokenContract.methods.approve(mainContractAddr, currentAmount).send({from:accounts[0]});
 
+            this.setState({tokenBuyNumber: currentAmount});
         } catch(err){
             console.log('Single Operation Buy Tokens Crashing');
             console.log(err.message);

@@ -86,52 +86,52 @@ contract('CustomToken', (accounts) => {
         }
     });
 
-    /**
-     * Evaluate if the current CustomToken Contract is able to reject an Overflow Attack in the transfer() operation
-     */
-    it('[  Tx  ]: Contract should be able to Reject OverFlow on transfer()', async () => {
-        try {
-            // Await Deployment of the Smart Contract
-            var myCustomTokenInstance = await myToken.deployed();
-            var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
-
-            // Default values for the accounts making the operations
-            var accountTwo = accounts[1];
-
-            // Perfom Transaction from accountOne to accountTwo.
-            var amount = 999999999999999999999999;
-            //await myCustomTokenInstance.approve();
-            await myCustomTokenInstance.transfer(accountTwo, amount);
-        } catch (err) {
-            //console.log(err.message);
-            assert.equal(err.message, 'invalid number value (arg="_amount", coderType="uint256", value=1e+24)', "This Contract is vulnerable to OverFlow Attacks");
-        }
-    });
-
-    /**
-     * Evaluate if the current CustomToken Contract is able to reject an UnderFlow Attack in the transfer() operation
-     */
-    it('[  Tx  ]: Contract should be able to Reject UnderFlow on transfer() using SafeMath', async () => {
-        try {
-
-            var myCustomTokenInstance = await myToken.deployed();
-
-            // Default values for the accounts making the operations
-            var accountOne = accounts[0];
-            var accountTwo = accounts[1];
-
-            // Retrieve initial balances from accountOne & accountTwo.
-            var accountOneStartingBalance = (await myCustomTokenInstance.getBalance.call(accountOne)).toNumber();
-            var accountTwoStartingBalance = (await myCustomTokenInstance.getBalance.call(accountTwo)).toNumber();
-
-            // Perform Transaction from accountOne to accountTwo.
-            var amount = -10000;
-            await myCustomTokenInstance.transfer(accountTwo, amount);
-        } catch (err) {
-            //console.log(err.message);
-            assert.equal(err.message, 'Returned error: VM Exception while processing transaction: revert', "This Contract is vulnerable to UnderFlow Attacks");
-        }
-    });
+    // /**
+    //  * Evaluate if the current CustomToken Contract is able to reject an Overflow Attack in the transfer() operation
+    //  */
+    // it('[  Tx  ]: Contract should be able to Reject OverFlow on transfer()', async () => {
+    //     try {
+    //         // Await Deployment of the Smart Contract
+    //         var myCustomTokenInstance = await myToken.deployed();
+    //         var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
+    //
+    //         // Default values for the accounts making the operations
+    //         var accountTwo = accounts[1];
+    //
+    //         // Perfom Transaction from accountOne to accountTwo.
+    //         var amount = 999999999999999999999999;
+    //         //await myCustomTokenInstance.approve();
+    //         await myCustomTokenInstance.transfer(accountTwo, amount);
+    //     } catch (err) {
+    //         //console.log(err.message);
+    //         assert.equal(err.message, 'invalid number value (arg="_amount", coderType="uint256", value=1e+24)', "This Contract is vulnerable to OverFlow Attacks");
+    //     }
+    // });
+    //
+    // /**
+    //  * Evaluate if the current CustomToken Contract is able to reject an UnderFlow Attack in the transfer() operation
+    //  */
+    // it('[  Tx  ]: Contract should be able to Reject UnderFlow on transfer() using SafeMath', async () => {
+    //     try {
+    //
+    //         var myCustomTokenInstance = await myToken.deployed();
+    //
+    //         // Default values for the accounts making the operations
+    //         var accountOne = accounts[0];
+    //         var accountTwo = accounts[1];
+    //
+    //         // Retrieve initial balances from accountOne & accountTwo.
+    //         var accountOneStartingBalance = (await myCustomTokenInstance.getBalance.call(accountOne)).toNumber();
+    //         var accountTwoStartingBalance = (await myCustomTokenInstance.getBalance.call(accountTwo)).toNumber();
+    //
+    //         // Perform Transaction from accountOne to accountTwo.
+    //         var amount = -10000;
+    //         await myCustomTokenInstance.transfer(accountTwo, amount);
+    //     } catch (err) {
+    //         //console.log(err.message);
+    //         assert.equal(err.message, 'Returned error: VM Exception while processing transaction: revert', "This Contract is vulnerable to UnderFlow Attacks");
+    //     }
+    // });
 });
 
 
