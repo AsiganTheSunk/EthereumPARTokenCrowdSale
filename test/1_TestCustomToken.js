@@ -100,10 +100,12 @@ contract('CustomToken', (accounts) => {
 
             // Retrieve initial balances from accountOne and accountTwo.
             var accountOneStartingBalance = (await myCustomTokenInstance.getBalance.call(accountOne)).toNumber();
-            var accountTwoStartingBalance = (await myCustomTokenInstance.getBalance.call(accountTwo)).toNumber();
+            console.log(accountOneStartingBalance);
 
+            var accountTwoStartingBalance = (await myCustomTokenInstance.getBalance.call(accountTwo)).toNumber();
+            console.log(accountTwoStartingBalance);
             // Perfom Transaction from accountOne to accountTwo.
-            var amount = 999999999999999;
+            var amount = 999999999999999999999999;
             await myCustomTokenInstance.transfer(accountTwo, amount);
         } catch (error) {
             console.log(err.message);
