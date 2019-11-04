@@ -14,6 +14,6 @@ function CrowdsaleInformation(props) {
             <br/>
         </div>
     )
-};
+}
 
 export default CrowdsaleInformation;

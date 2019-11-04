@@ -1,5 +1,6 @@
 import React from 'react';
 import Web3 from 'web3';
+import { time } from '@openzeppelin/test-helpers';
 
 class BuyForm extends React.Component {
     constructor(props) {
@@ -31,7 +32,9 @@ class BuyForm extends React.Component {
     claimTokenTransaction = async () => {
         try {
             const { accounts, mainContract, tokenContract, mainContractAddr, tokenBuyNumber } = this.state;
-            console.log(tokenBuyNumber);
+            console.log(tokenBuyNumber)
+            const aux_variable = await mainContract.methods.getTokenTotalSupplyFrom().send({sender:accounts[0]});
+            console.log('current aux_variable: ', aux_variable);
             await tokenContract.methods.approve(mainContractAddr, tokenBuyNumber).send({from:accounts[0]});
             await mainContract.methods.claimContribution().send({from: accounts[0]});
         } catch(err){
@@ -44,7 +47,7 @@ class BuyForm extends React.Component {
             const { accounts, mainContract } = this.state;
             await mainContract.methods.closeICO().send({from: accounts[0]});
             const crowdsaleRelease = await mainContract.methods.getReleaseTime().call();
-            const { time } = require('@openzeppelin/test-helpers');
+
             await time.increaseTo(crowdsaleRelease);
         } catch(err){
             console.log(err.message);

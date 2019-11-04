@@ -10,6 +10,6 @@ function WethInformation(props) {
             <br/>
         </div>
     )
-};
+}
 
 export default WethInformation;

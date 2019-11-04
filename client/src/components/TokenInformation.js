@@ -10,6 +10,6 @@ function TokenInformation(props) {
             <br/>
         </div>
     )
-};
+}
 
 export default TokenInformation;

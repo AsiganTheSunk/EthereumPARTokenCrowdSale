@@ -87,27 +87,6 @@ contract('CustomCrowdsale', (accounts) => {
     });
 
     /**
-     * Evaluate if the current CustomCrowdsale is able to reject a claim operation that does not meet the current time constraints in the CustomCrowdsale
-     */
-
-    /**
-     * Evaluate if the current CustomCrowdsale is able to reject a buy operation that does not meet the current cap limit in the CustomCrowdsal
-     */
-    it('[  Tx  ]: Contract should be able to reject an buy that is larger than the current cap', async () => {
-        try {
-            // Await Deployment of the Smart Contracts
-            var myTokenInstance = await myToken.deployed();
-            var myWethInstance = await myWeth.deployed();
-            var myCustomCrowdsaleInstance = await myCustomCrowdsale.deployed();
-
-            // Wait for all the Deployements to be over
-            Promise.all([myTokenInstance, myWethInstance, myCustomCrowdsaleInstance]);
-        } catch(err) {
-            console.log(err);
-        }
-    });
-
-    /**
      * Evaluate if the current CustomCrowdsale can perform all the necesary actions of a Crowsale, with cap, rate, goal and time constraints
      */
     it('[  Tx  ]: Contract should be able to perform a standard buy sequence', async () => {
@@ -213,7 +192,6 @@ contract('CustomCrowdsale', (accounts) => {
             // Retrieve current Token Balance held by the CustomCrowdsale
             var currentTokenBalance  = await myTokenInstance.getBalance(myCustomCrowdsale.address);
             console.log('       #  CurrentContribution in Crowdsale '+ String(currentTokenBalance));
-
 
             // DEBUG SECTION for Events in the CustomCrowdsale (Event/Emit)
             // myCustomCrowdsaleInstance.getPastEvents({fromBlock: 0, toBlock: 'latest'}, function(error, events){ console.log(events); })

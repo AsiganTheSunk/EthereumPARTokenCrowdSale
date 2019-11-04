@@ -10,6 +10,6 @@ function LoadingMessage() {
             </center>
         </div>
     )
-};
+}
 
 export default LoadingMessage;

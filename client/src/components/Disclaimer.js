@@ -19,7 +19,7 @@ function Disclaimer() {
             <br/>
         </div>
     )
-};
+}
 
 export default Disclaimer;
 

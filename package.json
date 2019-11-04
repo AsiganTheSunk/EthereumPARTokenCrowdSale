@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@openzeppelin/test-helpers": "^0.5.3",
+    "assert": "^2.0.0",
     "canonical-weth": "^1.4.0",
     "openzeppelin-solidity": "^2.3.0",
     "react": "^16.11.0",

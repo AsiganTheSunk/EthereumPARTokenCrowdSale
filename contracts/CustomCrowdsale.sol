@@ -159,6 +159,9 @@ contract CustomCrowdsale is Ownable {
         return token.totalSupply();
     }
 
+    function getTokenTotalSupplyFrom() public view returns(uint256) {
+        return contributions[msg.sender];
+    }
     // Total WETH9 held in the CustomCrowdsale
     function getWethTotalSupply() public view returns (uint256) {
         return weth9.totalSupply();
