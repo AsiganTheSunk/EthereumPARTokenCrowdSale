@@ -33,8 +33,10 @@ class BuyForm extends React.Component {
         try {
             const { accounts, mainContract, tokenContract, mainContractAddr, tokenBuyNumber } = this.state;
             console.log(tokenBuyNumber)
-            const aux_variable = await mainContract.methods.getTokenTotalSupplyFrom().send({sender:accounts[0]});
-            console.log('current aux_variable: ', aux_variable);
+            // const aux_variable = await mainContract.methods.getTokenTotalSupplyFrom().send({from:accounts[0]});
+            var currentWethBalance = (await mainContract.getWethTotalSupply().send({from:accounts[0]}));
+            //Promise.all([aux_variable2]);
+            console.log('current aux_variable: ', currentWethBalance);
             await tokenContract.methods.approve(mainContractAddr, tokenBuyNumber).send({from:accounts[0]});
             await mainContract.methods.claimContribution().send({from: accounts[0]});
         } catch(err){

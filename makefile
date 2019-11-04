@@ -8,6 +8,10 @@ MIGRATE_RESET = --reset
 NPM_START = npm start
 APP_CLIENT = --prefix ./client
 NPM_INSTALL = ./bin/install-travis.sh
+GANACHE_LAUNCH = ganache-cli -d
+
+launch_ganache:
+	$(GANACHE_LAUNCH)
 
 compile:
 	$(COMPILE)
