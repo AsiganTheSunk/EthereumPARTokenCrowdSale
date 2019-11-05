@@ -15,55 +15,56 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
  * It is meant to be used in the CustomCrowdsale Contract.
  */
 contract CustomToken is ERC20Detailed, Ownable {
-    // Use SafeMath for uint256 Operations to prevent UnderFlow/OverFlow
-    using SafeMath for uint256;
-    uint256 amount;
+    // Use SafeMath for uint Operations to prevent UnderFlow/OverFlow
+    using SafeMath for uint;
+    uint amount;
     // Mappings for Balance and Allowance
-    mapping (address => uint256)                       public  balanceOf;
-    mapping (address => mapping (address => uint256))  public  allowance;
+    mapping (address => uint)                       public  balanceOf;
+    mapping (address => mapping (address => uint))  public  allowance;
 
     /**
      * Events to track during CustomToken operations
      */
-    event Transfer(address indexed _from, address indexed _to, uint256 _value);
+    event Transfer(address indexed _from, address indexed _to, uint _value);
+    event Approval(address indexed _from, address indexed _to, uint _value);
 
     /**
       * Constructor for the CustomToken Contract
       */
-    constructor (uint256 _amount) public ERC20Detailed("Custom Token Currency", "CTC", 18) {
-        amount = _amount;
-        balanceOf[msg.sender] = _amount;
+    constructor (uint wad) public ERC20Detailed("Custom Token Currency", "CTC", 18) {
+        amount = wad;
+        balanceOf[msg.sender] = wad;
     }
 
     // Total Supply Function for the CustomToken
-    function totalSupply() public view returns (uint256) {
+    function totalSupply() public view returns (uint) {
         return address(this).balance;
     }
 
     // Approve Function for the CustomToken
-    function approve(address addr, uint _amount) public returns (bool) {
-        allowance[msg.sender][addr] = _amount;
-        emit Approval(msg.sender, addr, _amount);
+    function approve(address addr, uint wad) public returns (bool) {
+        allowance[msg.sender][addr] = wad;
+        emit Approval(msg.sender, addr, wad);
         return true;
     }
 
     // Transfer Function for the CustomToken
-    function transfer(address dst, uint _amount) public returns (bool) {
-        return transferFrom(msg.sender, dst, _amount);
+    function transfer(address dst, uint wad) public returns (bool) {
+        return transferFrom(msg.sender, dst, wad);
     }
 
     // TransferFrom Function for the CustomToken
-    function transferFrom(address src, address dst, uint _amount) public returns (bool) {
-        require(balanceOf[src] >= _amount,'');
+    function transferFrom(address src, address dst, uint wad) public returns (bool) {
+        require(balanceOf[src] >= wad,'');
         if (src != msg.sender && allowance[src][msg.sender] != uint(-1)) {
-            require(allowance[src][msg.sender] >= _amount, 'not enough Allowance ');
-            allowance[src][msg.sender] = allowance[src][msg.sender].add(_amount);
+            require(allowance[src][msg.sender] >= wad, 'not enough Allowance ');
+            allowance[src][msg.sender] = allowance[src][msg.sender].add(wad);
         }
 
-        balanceOf[src] = balanceOf[src].sub(_amount);
-        balanceOf[dst] = balanceOf[dst].add(_amount);
+        balanceOf[src] = balanceOf[src].sub(wad);
+        balanceOf[dst] = balanceOf[dst].add(wad);
 
-        emit Transfer(src, dst, _amount);
+        emit Transfer(src, dst, wad);
         return true;
     }
 
@@ -77,4 +78,3 @@ contract CustomToken is ERC20Detailed, Ownable {
         return balanceOf[addr];
     }
 }
-

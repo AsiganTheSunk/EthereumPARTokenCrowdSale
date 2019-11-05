@@ -80,6 +80,7 @@ contract('CustomToken', (accounts) => {
             // Retrieve current value for the decimals in CustomToken
             var currentDecimals = await myCustomTokenInstance.decimals();
 
+            // eslint-disable-next-line no-undef
             assert.equal(currentDecimals.valueOf(), expectedDecimals, 'Token Concract does not comply with the Expected Decimal Value.');
         } catch(err) {
             console.log(err.message);

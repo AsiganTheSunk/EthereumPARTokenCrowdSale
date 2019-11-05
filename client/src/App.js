@@ -145,11 +145,10 @@ class App extends Component {
         this.crowdsaleRate = await mainContract.methods.getRate().call();
         this.crowdsaleCap = await mainContract.methods.getCap().call();
         this.crowdsaleGoal = await mainContract.methods.getGoal().call();
-        this.crowdsaleStart = await mainContract.methods.getStartingTime().call(); // TODO: Change to a Proper Date Format
-        this.crowdsaleClose = await mainContract.methods.getClosingTime().call();  // TODO: Change to a Proper Date Format
-        this.crowdsaleRelease = ((await mainContract.methods.getReleaseTime().call()) - this.crowdsaleClose) / 60000;
+        this.crowdsaleClose = (await mainContract.methods.getClosingTime().call() - await mainContract.methods.getStartingTime().call())/ 60000;
+        this.crowdsaleRelease = ((await mainContract.methods.getReleaseTime().call()) - await mainContract.methods.getClosingTime().call()) / 60000;
         this.crowdsaleState = (await mainContract.methods.isCompleted().call()).toString();
-
+        // Beware of the ganache-cli, let it rest beetween relaunches
         Promise.all([this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState]);
         console.log('current state for crowdsale data', this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState);
 
@@ -188,7 +187,7 @@ class App extends Component {
 
                 <center>
                     <Account accountId={this.state.accounts[0]}/>
-                    <p>
+                    <div>
                         <WethInformation
                             wethName={this.wethName}
                             wethSymbol={this.wethSymbol}
@@ -198,19 +197,18 @@ class App extends Component {
                             tokenName={this.tokenName}
                             tokenSymbol={this.tokenSymbol}
                             tokenDecimals={this.tokenDecimals}
-                            tokenBalance={this.tokenBalance}
+                            tokenBalance={String(this.tokenBalance).slice(0,4)}
                         />
                         <CrowdsaleInformation
                             crowdsaleRate={this.crowdsaleRate}
-                            crowdsaleCap={this.crowdsaleCap}
-                            crowdsaleGoal={this.crowdsaleGoal}
-                            crowdsaleBalance={this.crowdsaleBalance}
+                            crowdsaleCap={String(this.crowdsaleCap).slice(0,2)}
+                            crowdsaleGoal={String(this.crowdsaleGoal).slice(0,2)}
                             crowdsaleStart={this.crowdsaleStart}
                             crowdsaleClose={this.crowdsaleClose}
                             crowdsaleRelease={this.crowdsaleRelease}
                             crowdsaleState={this.crowdsaleState}
                         />
-                    </p>
+                    </div>
                 </center>
                 <div>
                     <center>
@@ -222,6 +220,7 @@ class App extends Component {
                             tokenContractAddr={this.state.tokenContractAddr}
                             wethContract={this.state.wethContract}
                             wethContractAddr={this.state.wethContractAddr}
+                            crowdsaleData={this.state.crowdsaleData}
                         />
                         <br/>
                         <Disclaimer/>

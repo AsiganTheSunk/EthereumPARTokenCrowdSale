@@ -87,7 +87,7 @@ contract('WETH9', (accounts) => {
     });
 
     // /**
-    //   * Evaluate if the current WETH9 Contract is able to reject the a withdraw of a negative value
+    //   * Evaluate if the current WETH9 Contract is able to reject the a withdraw of a negative value: WORKING IN LOCAL, FAILING IN TRAVIS
     //   */
     // it('[  Tx  ]: Contract should be able to Reject withdraw() for more tokens than the balance deposited', async () => {
     //     try {

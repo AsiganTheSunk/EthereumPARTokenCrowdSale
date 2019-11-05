@@ -10,6 +10,6 @@ function Account(props) {
             <br/>
         </div>
     )
-};
+}
 
 export default Account;
