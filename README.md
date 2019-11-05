@@ -13,5 +13,5 @@
 
 - This Crowdsale is implemented with a Time Constraints limiting the Release Time of the sold tokens, a Ratio of Exchange, a Contribution Goal & Limit Sale defined as Cap.
 
-- This Crowdsale has client side developed with **ReactJs** and **Webjs**.
+- This Crowdsale has a client side developed with **ReactJs** and **Webjs**.
 
