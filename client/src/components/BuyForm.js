@@ -1,6 +1,6 @@
 import React from 'react';
 import Web3 from 'web3';
-import { time } from '@openzeppelin/test-helpers';
+import { time, BN } from '@openzeppelin/test-helpers';
 
 class BuyForm extends React.Component {
     constructor(props) {
@@ -15,6 +15,7 @@ class BuyForm extends React.Component {
             accounts: this.props.accounts,
             mainContract: this.props.mainContract,
             mainContractAddr: this.props.mainContractAddr,
+            crowdsaleData: this.props.crowdsaleData,
             tokenContract: this.props.tokenContract,
             tokenContractAddr: this.props.tokenContractAddr,
             wethContract: this.props.wethContract,
@@ -31,11 +32,12 @@ class BuyForm extends React.Component {
 
     claimTokenTransaction = async () => {
         try {
-            const { accounts, mainContract, tokenContract, mainContractAddr, tokenBuyNumber } = this.state;
-            console.log(tokenBuyNumber);
-            // var currentWethBalance = (await mainContract.getWethTotalSupply().send({from:accounts[0]}));
-            var weiAmount = Web3.utils.toWei(tokenBuyNumber.toString());
-            await tokenContract.methods.approve(mainContractAddr, tokenBuyNumber).send({'from':accounts[0]});
+            const { accounts, mainContract, tokenContract, mainContractAddr, tokenBuyNumber, crowdsaleData } = this.state;
+            // TODO: ADD TOKEN RATE TO THE STATE VARIABLES SO IT CAN BE ACCESSED WHEN THE APPROVE OPERATION IS FORMED
+            //var rate = tokenData.crowdsaleRate;
+
+            var weiAmount = new BN(String(tokenBuyNumber * crowdsaleData.crowdsaleRate));
+            await tokenContract.methods.approve(mainContractAddr, String(weiAmount)).send({'from':accounts[0]});
             await mainContract.methods.claimContribution().send({'from': accounts[0]});
         } catch(err){
             console.log(err.message);
@@ -56,7 +58,7 @@ class BuyForm extends React.Component {
 
     buySingleTokensTransaction = async (currentAmount) => {
         try {
-            const { accounts, mainContract, tokenContract, wethContract, mainContractAddr } = this.state;
+            const { accounts, mainContract, wethContract, mainContractAddr } = this.state;
 
             console.log('Current Contract Data');
             console.log('--------------------------------------------------');
@@ -70,10 +72,10 @@ class BuyForm extends React.Component {
             // ADD RATE IN THE APPROVAL?
             await wethContract.methods.deposit().send({'value': weiAmount, 'from': accounts[0]});
             await wethContract.methods.approve(mainContractAddr, weiAmount).send({'from':accounts[0]});
-            await mainContract.methods.buyToken().send({'from':accounts[0], 'value': currentAmount});
+            await mainContract.methods.buyToken().send({'from':accounts[0], 'value': String(weiAmount)});
             //await tokenContract.methods.approve(mainContractAddr, currentAmount * 2).send({from:accounts[0]});
 
-            this.setState({tokenBuyNumber: currentAmount});
+            this.setState({tokenBuyNumber: weiAmount});
         } catch(err){
             console.log('Single Operation Buy Tokens Crashing');
             console.log(err.message);

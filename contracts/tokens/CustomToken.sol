@@ -15,28 +15,29 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
  * It is meant to be used in the CustomCrowdsale Contract.
  */
 contract CustomToken is ERC20Detailed, Ownable {
-    // Use SafeMath for uint256 Operations to prevent UnderFlow/OverFlow
-    using SafeMath for uint256;
-    uint256 amount;
+    // Use SafeMath for uint Operations to prevent UnderFlow/OverFlow
+    using SafeMath for uint;
+    uint amount;
     // Mappings for Balance and Allowance
-    mapping (address => uint256)                       public  balanceOf;
-    mapping (address => mapping (address => uint256))  public  allowance;
+    mapping (address => uint)                       public  balanceOf;
+    mapping (address => mapping (address => uint))  public  allowance;
 
     /**
      * Events to track during CustomToken operations
      */
-    event Transfer(address indexed _from, address indexed _to, uint256 _value);
+    event Transfer(address indexed _from, address indexed _to, uint _value);
+    event Approval(address indexed _from, address indexed _to, uint _value);
 
     /**
       * Constructor for the CustomToken Contract
       */
-    constructor (uint256 wad) public ERC20Detailed("Custom Token Currency", "CTC", 18) {
+    constructor (uint wad) public ERC20Detailed("Custom Token Currency", "CTC", 18) {
         amount = wad;
         balanceOf[msg.sender] = wad;
     }
 
     // Total Supply Function for the CustomToken
-    function totalSupply() public view returns (uint256) {
+    function totalSupply() public view returns (uint) {
         return address(this).balance;
     }
 
@@ -77,4 +78,3 @@ contract CustomToken is ERC20Detailed, Ownable {
         return balanceOf[addr];
     }
 }
-

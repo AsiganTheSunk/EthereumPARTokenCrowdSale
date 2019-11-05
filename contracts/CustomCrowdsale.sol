@@ -28,37 +28,37 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
  * contributions - Value Defining the every buy until claim in CustomCrowdsale
  */
 contract CustomCrowdsale is Ownable {
-    using SafeMath for uint256;
+    using SafeMath for uint;
 
     // Tokens To Exchange during the CustomCrowdsale
     WETH9 public weth9;
     CustomToken public token;
 
     // Caracteristics of the CustomCrowdsale
-    uint256 public rate;
-    uint256 public cap;
-    uint256 public contributionGoal;
-    uint256 public currentContribution = 0;
+    uint public rate;
+    uint public cap;
+    uint public contributionGoal;
+    uint public currentContribution = 0 ether;
 
     // Time Constraint Variables for the CustomCrowdsale
-    uint256 public startingTime;
-    uint256 public closingTime;
-    uint256 public releaseTime;
+    uint public startingTime;
+    uint public closingTime;
+    uint public releaseTime;
 
     // Current Status for the CustomCrowdsale
     bool public ICOCompleted = false;
     bool public ICOGoalReached = false;
 
     // Mapping of the Contributions for the CustomCrowdsale
-    mapping (address => uint256) public contributions;
+    mapping (address => uint) public contributions;
 
     /**
       * Events to track during CustomCrowsale operations
       */
-    event Contribution(address _from, uint256 _amount);
-    event ClaimContribution(address _from, uint256 _amount);
-    event CloseCrowdsale(address _from, uint256 time);
-    event claimContributionPreTx(address _sender, uint256 _claimedTokens, uint256 _balance);
+    event Contribution(address _from, uint _amount);
+    event ClaimContribution(address _from, uint _amount);
+    event CloseCrowdsale(address _from, uint time);
+    event claimContributionPreTx(address _sender, uint _claimedTokens, uint _balance);
 
     //event claimContributionPostTx();
     //event openCrowdsale();
@@ -67,6 +67,12 @@ contract CustomCrowdsale is Ownable {
     modifier whenICOCompleted {
         require(ICOCompleted, 'CustomCrowdsale Not Completed');
         require(now >= releaseTime, 'CustomCrowdsale releases the CustomTokens 2min after');
+        _;
+    }
+
+    modifier whenICONOtCompleted {
+        require(!ICOCompleted, 'CustomCrowdsale Not Completed');
+        require(closingTime >= now, 'CustomCrowdsale releases the CustomTokens 2min after');
         _;
     }
 
@@ -79,7 +85,7 @@ contract CustomCrowdsale is Ownable {
 
     // Contract Constructor for CustomCrowdsale
     // NOTE: Only a contracts with fallback function needs address playable. deposit()
-    constructor(uint256 _rate, uint256 _cap, uint256 _contributionGoal, address payable _wethAddr, address _tokenAddr, uint256 _staringTime, uint256 _closingTime, uint256 _releaseTime) public {
+    constructor(uint _rate, uint _cap, uint _contributionGoal, address payable _wethAddr, address _tokenAddr, uint _staringTime, uint _closingTime, uint _releaseTime) public {
         rate = _rate;
         cap = _cap;
         contributionGoal = _contributionGoal;
@@ -110,36 +116,37 @@ contract CustomCrowdsale is Ownable {
     }
 
     // Buy Funtion for the CustomCrowdsale
-    function buyToken() public payable returns (bool) {
-        uint256 _contribution = msg.value;
-        // Requirement contribution must be less than the Cap
-        require(_contribution < cap, 'CustomCrowdsaled buyToken() has exceed the cap');
-        // Requirement currentContribution must be less than the contributionGoal
-        require(currentContribution < contributionGoal, 'CustomCrowdsale has succeed in the pursue of the contributionGoal');
-        // Requirement contribution must be higher than 0 in the CustomCrowdsale
-        require(_contribution >= 0,'contribution parameter must be above 0');
+    function buyToken() public whenICONOtCompleted payable returns (bool) {
+            uint _contribution = msg.value;
+            // Requirement contribution must be less than the Cap
+            require(_contribution < cap, 'CustomCrowdsaled buyToken() has exceed the cap');
+            // Requirement currentContribution must be less than the contributionGoal
+            require(currentContribution < contributionGoal, 'CustomCrowdsale has succeed in the pursue of the contributionGoal');
+            // Requirement contribution must be higher than 0 in the CustomCrowdsale
+            require(_contribution >= 0,'contribution parameter must be above 0');
 
-        uint256 aux = 0;
-        aux.add(_contribution);
-        aux.add(currentContribution);
-        // If the current buy does not exceed the cap but overreaches the actual contributionGoal, the tokens left would be sold instead
-        if (aux > contributionGoal) {
-            _contribution = contributionGoal.sub(currentContribution);
-            ICOGoalReached = true;
-        }
-        // Requirement transferForm must be successful
-        require(weth9.transferFrom(msg.sender, address(this), _contribution), "transferFrom() Wether has Failed");
-        currentContribution = currentContribution.add(_contribution);
-        contributions[msg.sender] = contributions[msg.sender].add(_contribution);
-        // Emit Current Status Post BuyToken
-        emit Contribution(msg.sender, _contribution);
-        return true;
+            uint aux = 0;
+            aux.add(_contribution);
+            aux.add(currentContribution);
+            // If the current buy does not exceed the cap but overreaches the actual contributionGoal, the tokens left would be sold instead
+            if (aux > contributionGoal) {
+                _contribution = contributionGoal.sub(currentContribution);
+                ICOGoalReached = true;
+            }
+            // Requirement transferForm must be successful
+            require(weth9.transferFrom(msg.sender, address(this), _contribution), "transferFrom() Wether has Failed");
+            currentContribution = currentContribution.add(_contribution);
+            contributions[msg.sender] = contributions[msg.sender].add(_contribution);
+            // Emit Current Status Post BuyToken
+            emit Contribution(msg.sender, _contribution);
+            return true;
     }
 
     // Claim Function for the CustomCrowdsale
-    function claimContribution() public whenICOCompleted returns (bool) {
+    function claimContribution() public whenICOCompleted returns (uint) {
         // Calculate the Exchange Rate
-        uint256 claimedTokens = contributions[msg.sender].mul(rate);
+        uint claimedTokens = contributions[msg.sender].mul(rate);
+        //token.amount = token.amount.sub(claimedTokens);
         // Emit Current Status Pre Claim
         emit claimContributionPreTx(msg.sender, claimedTokens, contributions[msg.sender]);
         if(contributions[msg.sender] != 0) {
@@ -150,9 +157,9 @@ contract CustomCrowdsale is Ownable {
             emit ClaimContribution(msg.sender, claimedTokens);
             // Set the contribution of the sender to 0
             contributions[msg.sender] = 0;
-            return true;
+            return claimedTokens;
         }
-        return false;
+        return 0;
     }
 
     /**
@@ -160,37 +167,37 @@ contract CustomCrowdsale is Ownable {
      */
 
     // Total Tokens held in the CustomCrowdsale
-    function getTokenTotalSupply() public view returns(uint256) {
+    function getTokenTotalSupply() public view returns(uint) {
         return token.totalSupply();
     }
 
-    function getTokenToClaim(address contributor) public view returns(uint256) {
+    function getTokenToClaim(address contributor) public view returns(uint) {
         return contributions[contributor] * rate;
     }
 
 
     // Total WETH9 held in the CustomCrowdsale
-    function getWethTotalSupply() public view returns (uint256) {
+    function getWethTotalSupply() public view returns (uint) {
         return weth9.totalSupply();
     }
 
     // Current Contributions
-    function getCurrentContribution() public view returns (uint256) {
+    function getCurrentContribution() public view returns (uint) {
         return currentContribution;
     }
 
     // Current Rate in the CustomCrowdsale
-    function getRate() public view returns (uint256) {
+    function getRate() public view returns (uint) {
         return rate;
     }
 
     // Current Cap in the CustomCrowdsale
-    function getCap() public view returns (uint256) {
+    function getCap() public view returns (uint) {
         return cap;
     }
 
     // Current Goal in the CustomCrowdsale
-    function getGoal() public view returns (uint256) {
+    function getGoal() public view returns (uint) {
         return contributionGoal;
     }
 
@@ -200,17 +207,17 @@ contract CustomCrowdsale is Ownable {
     }
 
     // Current Starting Time in the CustomCrowdsale
-    function getStartingTime() public view returns (uint256) {
+    function getStartingTime() public view returns (uint) {
         return startingTime;
     }
 
     // Current ClosingTime in the CustomCrowdsale
-    function getClosingTime() public view returns (uint256) {
+    function getClosingTime() public view returns (uint) {
         return closingTime;
     }
 
     // Current ReleaseTime in the CustomCrowdsale
-    function getReleaseTime() public view returns (uint256) {
+    function getReleaseTime() public view returns (uint) {
         return releaseTime;
     }
 }

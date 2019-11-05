@@ -6,9 +6,9 @@ function CrowdsaleInformation(props) {
             <br/>
             <b> [ Crowdsale Information ] </b>
             <br/>
-            <b> Rate: </b> {props.crowdsaleRate}, <b> Cap: </b> {props.crowdsaleCap}, <b> Goal: </b> {props.crowdsaleGoal}, <b> Token Balance: </b> {props.crowdsaleBalance}
+            <b> Rate: </b> {props.crowdsaleRate}, <b> Cap: </b> {props.crowdsaleCap}, <b> Goal: </b> {props.crowdsaleGoal}
             <br/>
-            <b> OpeningTime: </b> {props.crowdsaleStart}, <b> ClosingTime: </b> {props.crowdsaleClose}, <b> ReleaseTime: </b> {props.crowdsaleRelease} min
+            <b> ClosingTime in </b> {props.crowdsaleClose} min, <b> ReleaseTime in </b> {props.crowdsaleRelease} min
             <br/>
             <b> Status(isClosed): </b> {props.crowdsaleState}
             <br/>
