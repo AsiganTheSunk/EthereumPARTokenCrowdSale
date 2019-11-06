@@ -12,6 +12,8 @@ include:
 
 install:
   - npm install
+  - npm install -g ganache-cli@6.6.0
+  - npm install -g truffle@5.0.38
 
 script:
   - bash ./bin/test-contract-travis.sh
