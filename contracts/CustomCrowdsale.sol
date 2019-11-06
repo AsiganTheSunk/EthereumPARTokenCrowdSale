@@ -146,8 +146,8 @@ contract CustomCrowdsale is Ownable {
     }
 
     // Total Tokens held in the CustomCrowdsale
-    function getTokenTotalSupply() public view returns(uint) {
-        return token.totalSupply();
+    function getTokenTotalSupply(address src) public view returns(uint) {
+        return token.getBalance(src);
     }
 
     // Total WETH9 held in the CustomCrowdsale

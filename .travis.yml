@@ -7,8 +7,6 @@ node_js:
 include:
   - os: linux
     dist: xenial
-    before_install:
-      - rm -rf node_modules
 
 install:
   - npm install
