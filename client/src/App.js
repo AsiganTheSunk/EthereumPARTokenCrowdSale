@@ -142,11 +142,11 @@ class App extends Component {
         console.log('current state for token data',this.tokenName, this.tokenSymbol, this.tokenDecimals, this.tokenBalance);
 
         // Get static values from the contract CustomCrowdsale to prove it was correctly loaded by Web3js
-        this.crowdsaleRate = await mainContract.methods.getRate().call();
-        this.crowdsaleCap = await mainContract.methods.getCap().call();
-        this.crowdsaleGoal = await mainContract.methods.getGoal().call();
-        this.crowdsaleClose = (await mainContract.methods.getClosingTime().call() - await mainContract.methods.getStartingTime().call())/ 60000;
-        this.crowdsaleRelease = ((await mainContract.methods.getReleaseTime().call()) - await mainContract.methods.getClosingTime().call()) / 60000;
+        this.crowdsaleRate = await mainContract.methods.rate().call();
+        this.crowdsaleCap = await mainContract.methods.cap().call();
+        this.crowdsaleGoal = await mainContract.methods.contributionGoal().call();
+        this.crowdsaleClose = (await mainContract.methods.closingTime().call() - await mainContract.methods.startingTime().call())/ 60000;
+        this.crowdsaleRelease = ((await mainContract.methods.releaseTime().call()) - await mainContract.methods.closingTime().call()) / 60000;
         this.crowdsaleState = (await mainContract.methods.isCompleted().call()).toString();
         // Beware of the ganache-cli, let it rest beetween relaunches
         Promise.all([this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState]);

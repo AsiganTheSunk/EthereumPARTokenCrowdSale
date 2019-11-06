@@ -21,7 +21,7 @@ class BuyForm extends React.Component {
             wethContract: this.props.wethContract,
             wethContractAddr: this.props.wethContractAddr,
 
-            currentValue: 0, tokenBuyNumber:0
+            currentValue: 0
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -32,12 +32,7 @@ class BuyForm extends React.Component {
 
     claimTokenTransaction = async () => {
         try {
-            const { accounts, mainContract, tokenContract, mainContractAddr, tokenBuyNumber, crowdsaleData } = this.state;
-            // TODO: ADD TOKEN RATE TO THE STATE VARIABLES SO IT CAN BE ACCESSED WHEN THE APPROVE OPERATION IS FORMED
-            //var rate = tokenData.crowdsaleRate;
-
-            var weiAmount = new BN(String(tokenBuyNumber * crowdsaleData.crowdsaleRate));
-            await tokenContract.methods.approve(mainContractAddr, String(weiAmount)).send({'from':accounts[0]});
+            const { accounts, mainContract } = this.state;
             await mainContract.methods.claimContribution().send({'from': accounts[0]});
         } catch(err){
             console.log(err.message);
@@ -58,7 +53,7 @@ class BuyForm extends React.Component {
 
     buySingleTokensTransaction = async (currentAmount) => {
         try {
-            const { accounts, mainContract, wethContract, mainContractAddr } = this.state;
+            const { accounts, mainContract, wethContract, mainContractAddr, crowdsaleData, tokenContract } = this.state;
 
             console.log('Current Contract Data');
             console.log('--------------------------------------------------');
@@ -73,9 +68,9 @@ class BuyForm extends React.Component {
             await wethContract.methods.deposit().send({'value': weiAmount, 'from': accounts[0]});
             await wethContract.methods.approve(mainContractAddr, weiAmount).send({'from':accounts[0]});
             await mainContract.methods.buyToken().send({'from':accounts[0], 'value': String(weiAmount)});
-            //await tokenContract.methods.approve(mainContractAddr, currentAmount * 2).send({from:accounts[0]});
+            var ctcAmount = new BN(String(weiAmount * crowdsaleData.crowdsaleRate));
+            await tokenContract.methods.approve(mainContractAddr, String(ctcAmount)).send({'from':accounts[0]});
 
-            this.setState({tokenBuyNumber: weiAmount});
         } catch(err){
             console.log('Single Operation Buy Tokens Crashing');
             console.log(err.message);
