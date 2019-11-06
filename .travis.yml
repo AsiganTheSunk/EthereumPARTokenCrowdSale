@@ -2,16 +2,16 @@ dist: xenial
 sudo: required
 language: node_js
 node_js:
-  - "10.17.0"
+  - 10
 
 include:
   - os: linux
     dist: xenial
     before_install:
       - rm -rf node_modules
-      -
+
 install:
-  - bash npm install
+  - npm install
 
 script:
   - bash ./bin/test-contract-travis.sh
