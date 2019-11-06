@@ -21,7 +21,7 @@ contract('CustomCrowdsale', (accounts) => {
             var expectedRate = 2;
 
             // Retrieve Current rate value in CustomCrowdsale Contract
-            var rate = await myCustomCrowdsaleInstance.getRate();
+            var rate = await myCustomCrowdsaleInstance.rate();
 
             assert.equal(rate.toNumber(), expectedRate, 'CustomCrowdsale Contract Should have a Rate of 2');
         } catch(err) {
@@ -41,7 +41,7 @@ contract('CustomCrowdsale', (accounts) => {
             var expectedCap = ether('10');
 
             // Retrieve Current cap value in CustomCrowdsale Contract
-            var cap = await myCustomCrowdsaleInstance.getCap();
+            var cap = await myCustomCrowdsaleInstance.cap();
 
             assert.equal(String(cap), String(expectedCap), 'CustomCrowdsale Contract Should have a Cap of 100');
         } catch(err){
@@ -61,7 +61,7 @@ contract('CustomCrowdsale', (accounts) => {
             var expected_goal = ether('50');
 
              // Retrieve Current cap value in CustomCrowdsale Contract
-            var goal = await myCustomCrowdsaleInstance.getGoal();
+            var goal = await myCustomCrowdsaleInstance.contributionGoal();
 
             assert.equal(String(goal), String(expected_goal), 'CustomCrowdsale Contract Should have a Goal of 50');
         } catch(err) {
@@ -126,7 +126,7 @@ contract('CustomCrowdsale', (accounts) => {
             console.log('         (?)  Current Ether to Invest in the CustomCrowdsale Conctract: ' + String(currentEtherToInvest).slice(0,1) + ' ether');
             await myCustomCrowdsaleInstance.buyToken({'from': account0, 'value': currentEtherToInvest});
 
-            var rate = await myCustomCrowdsaleInstance.getRate();
+            var rate = await myCustomCrowdsaleInstance.rate();
             var currentAmmountToApprove = new BN(rate * currentTokenToBuy);
             try {
                 /**
@@ -148,9 +148,9 @@ contract('CustomCrowdsale', (accounts) => {
               */
             console.log('         (+)  Perform the claim from the buyer on the owned tokens with the time contraint/closed ICO being met');
             // Perform the closing of the CustomCrowdsale
-            await myCustomCrowdsaleInstance.closeICO();
+            await myCustomCrowdsaleInstance.closeCustomCrowdsale();
             // Retrieve the releaseTime from the CustomCrowdsale
-            var releaseTime = (await myCustomCrowdsaleInstance.getReleaseTime());
+            var releaseTime = (await myCustomCrowdsaleInstance.releaseTime());
             // Using openzeppelin time, increase the time to the releaseTime
             await time.increaseTo(releaseTime);
 
@@ -160,7 +160,7 @@ contract('CustomCrowdsale', (accounts) => {
             // Retrieve the Current state of the Crowdsale
             var valueIsCompleted =  await myCustomCrowdsaleInstance.isCompleted();
             // Assertion of the Current state vs Expected stateof the CustomCrowdsale
-            console.log('         (?)  Current Status for the CustomCrowdsale Conctract isCompleted: ' + String(isCompleted));
+            console.log('         (?)  Current Status for the CustomCrowdsale Conctract isCompleted: ' + String(valueIsCompleted));
             assert.equal(valueIsCompleted.valueOf(), true, 'CustomCrowdsale Contract Should have a hasClosed of true');
 
             // Retrieve the Current Amount of tokens owned by the CustomCrowdsale
@@ -172,7 +172,7 @@ contract('CustomCrowdsale', (accounts) => {
               * Perform the claim from the buyer on the owned tokens
               */
             // Aprove the current transfer of the amount that has been 44444
-            var rate = await myCustomCrowdsaleInstance.getRate();
+            var rate = await myCustomCrowdsaleInstance.rate();
             var currentAmmountToApprove = new BN(rate * currentTokenToBuy);
             console.log('         (+)  Approve of Tx with the Current TokenToInvest for CustomCrowdsale Contract: ' + String(currentAmmountToApprove).slice(0,2) + ' token');
             await myTokenInstance.approve(myCustomCrowdsaleInstance.address, currentAmmountToApprove);
@@ -180,7 +180,7 @@ contract('CustomCrowdsale', (accounts) => {
             var currentClaimedTokens = await myCustomCrowdsaleInstance.claimContribution({from:account0});
             console.log('         (+)  Claim of Tx with the Current TokenToInvest for CustomCrowdsale Contract: ' + String(currentAmmountToApprove).slice(0,2) + ' token');
             // Retrieve current contribution held by the CustomCrowdsale
-            var currentContribution  = await myCustomCrowdsaleInstance.getCurrentContribution();
+            var currentContribution  = await myCustomCrowdsaleInstance.currentContribution();
             console.log('         (?)  CurrentContribution in CustomCrowdsale '+ String(currentContribution).slice(0,1) + ' ether');
             // Retrieve current Balance held by the buyer
             var balance_account0 = await myTokenInstance.getBalance(account0);

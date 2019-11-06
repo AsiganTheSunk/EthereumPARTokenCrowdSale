@@ -1,4 +1,4 @@
-const { balance, BN, time, ether, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
+const { ether } = require('@openzeppelin/test-helpers');
 
 // Deployment Artifacts for the CustomToken, WETH9 & SafeWETH9 Contracts
 var myWETH9 = artifacts.require("canonical-weth/contracts/WETH9.sol");

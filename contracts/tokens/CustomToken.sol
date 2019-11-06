@@ -22,18 +22,14 @@ contract CustomToken is ERC20Detailed, Ownable {
     mapping (address => uint)                       public  balanceOf;
     mapping (address => mapping (address => uint))  public  allowance;
 
-    /**
-     * Events to track during CustomToken operations
-     */
+    // Events to track during CustomToken operations
     event Transfer(address indexed _from, address indexed _to, uint _value);
     event Approval(address indexed _from, address indexed _to, uint _value);
 
-    /**
-      * Constructor for the CustomToken Contract
-      */
+    // Constructor for the CustomToken Contract
     constructor (uint wad) public ERC20Detailed("Custom Token Currency", "CTC", 18) {
-        amount = wad;
         balanceOf[msg.sender] = wad;
+        amount = wad;
     }
 
     // Total Supply Function for the CustomToken
@@ -55,15 +51,14 @@ contract CustomToken is ERC20Detailed, Ownable {
 
     // TransferFrom Function for the CustomToken
     function transferFrom(address src, address dst, uint wad) public returns (bool) {
-        require(balanceOf[src] >= wad,'');
+        require(balanceOf[src] >= wad,'Not Enough Funds');
+
         if (src != msg.sender && allowance[src][msg.sender] != uint(-1)) {
-            require(allowance[src][msg.sender] >= wad, 'not enough Allowance ');
+            require(allowance[src][msg.sender] >= wad, 'Not enough Allowance ');
             allowance[src][msg.sender] = allowance[src][msg.sender].add(wad);
         }
-
         balanceOf[src] = balanceOf[src].sub(wad);
         balanceOf[dst] = balanceOf[dst].add(wad);
-
         emit Transfer(src, dst, wad);
         return true;
     }

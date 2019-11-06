@@ -1,11 +1,11 @@
+const { ether } = require('@openzeppelin/test-helpers');
+
 // Deployment Artifact for the Custom Crowdsale Contract
 var myCustomCrowdSale = artifacts.require("./CustomCrowdsale.sol");
 
 // Deployment Artifacts for the CustomToken, WETH9 & SafeWETH9 Contracts
 var myWETH9 = artifacts.require("canonical-weth/contracts/WETH9.sol");
 var myCustomToken = artifacts.require("./CustomToken.sol");
-
-const { balance, BN, time, ether, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 
 module.exports = async function(deployer, accounts, [owner]) {
     // Deployment Variables for the CustomCrowdsale Contract
