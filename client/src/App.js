@@ -73,7 +73,7 @@ class App extends Component {
             crowdsaleInstance: null, crowdsaleInstanceAddr: null,
             crowdsaleRate: 0, crowdsaleGoal: 0, crowdsaleCap: 0, crowdsaleStart: 0,
             crowdsaleClose: 0, crowdsaleRelease: 0, crowdsaleBalance:0 ,
-            crowdsaleState:false, crowdsaleOwner: false,
+            crowdsaleState:false, crowdsaleOwner: false, crowdsaleIsOwner: null,
             crowdsaleTokensLeft: 0, crowdsaleTokensUntilGoal: 0, crowdsaleInitTime: this.crowdsaleInitTime,
         };
 
@@ -168,14 +168,13 @@ class App extends Component {
         this.crowdsaleClose = (await mainContract.methods.closingTime().call() - await mainContract.methods.startingTime().call())/ 60000;
         this.crowdsaleRelease = ((await mainContract.methods.releaseTime().call()) - await mainContract.methods.closingTime().call()) / 60000;
         this.crowdsaleState = (await mainContract.methods.isCompleted().call()).toString();
-
         this.crowdsaleIsOwner = (await mainContract.methods.isOwner().call({'from':accounts[0]}));
         this.crowdsaleTokensLeft = (await mainContract.methods.getTokenTotalSupply(mainContractAddr).call());
         this.crowdsaleTokensUntilGoal = (this.crowdsaleGoal = await mainContract.methods.contributionGoal().call() - await mainContract.methods.currentContribution().call());
         console.log("Token Status", String(this.crowdsaleTokensLeft).slice(0, String(this.crowdsaleTokensLeft).length -18), '/', String(this.crowdsaleTokensUntilGoal).slice(0, String(this.crowdsaleTokensUntilGoal).length -18));
 
         // Promise all values so it guarantees that the contracts will provide the information
-        Promise.all([this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState, this.crowdsaleOwner]);
+        Promise.all([this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState, this.crowdsaleIsOwner]);
         console.log('current state for crowdsale data', this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleIsOwner);
 
         // Save Current Status of the Contracts in state objects in case any component needs the current values
@@ -197,6 +196,7 @@ class App extends Component {
         crowdsaleData.crowdsaleState = this.crowdsaleState;
         crowdsaleData.crowdsaleTokensLeft = this.crowdsaleTokensLeft;
         crowdsaleData.crowdsaleTokensUntilGoal = this.crowdsaleTokensUntilGoal;
+        crowdsaleData.crowdsaleIsOwner = this.crowdsaleIsOwner;
 
         this.setState({
             mainContract, tokenContract, wethContract,

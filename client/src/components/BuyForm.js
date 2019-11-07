@@ -126,7 +126,8 @@ class BuyForm extends React.Component {
             padding: 2,
             margin: 3
         };
-        if (!crowdsaleData.crowdsaleIsOwner) {
+
+        if (crowdsaleData.crowdsaleIsOwner) {
             return (
                 <div>
                     <form>
