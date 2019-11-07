@@ -1,7 +1,7 @@
 /**
  * Init() Section for the Deployed Contracts CustomToken, WETH9 & CustomCrowdsale
  */
-const { balance, BN, time, ether, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
+const { ether, BN, time } = require('@openzeppelin/test-helpers');
 
 var myWeth = artifacts.require("canonical-weth/contracts/WETH9.sol");
 var myToken = artifacts.require("../contracts/tokens/CustomToken.sol");

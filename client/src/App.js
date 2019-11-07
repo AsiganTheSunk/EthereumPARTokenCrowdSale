@@ -33,6 +33,7 @@ class App extends Component {
         super(props);
         this.appName = 'CustomTokenCrodwsale';
 
+        this.crowdsaleInitTime = Date.now();
         // Crowdsale Static Data Variables
         this.crowdsaleRate = 0;
         this.crowdsaleGoal = 0;
@@ -40,12 +41,9 @@ class App extends Component {
         this.crowdsaleStart = 0;
         this.crowdsaleRelease = 0;
         this.crowdsaleClose = 0;
-        this.crowdsaleBalance = 0;
-
-        // Crowdsale Dinamic Data Variables
-        this.crowdsaleTokenSupply = 0;
-        this.crowdsaleWethSupply = 0;
-        this.crowdsaleContribution = 0;
+        this.crowdsaleTokensLeft = 0;
+        this.crowdsaleTokensUntilGoal = 0;
+        this.crowdsaleIsOwner = false;
         this.crowdsaleState = false;
 
         // Token & Weth Static Data Variables
@@ -57,9 +55,27 @@ class App extends Component {
         this.tokenDecimals = '';
         this.tokenBalance = '';
 
-        this.weth = { wethName: '', wethSymbol: '', wethDecimals: '' };
-        this.token = { tokenName: '', tokenSymbol: '', tokenDecimals: '', tokenBalance: ''};
-        this.crowdsale = {crowdsaleRate: 0, crowdsaleGoal: 0, crowdsaleCap: 0, crowdsaleStart: 0, crowdsaleClose: 0, crowdsaleRelease: 0, crowdsaleBalance:0 , crowdsaleState:false };
+        // TODO: Move Data to the proper State Varibles
+        // Weth Data to be Stored in the State
+        this.weth = {
+            wethInstance: null, wethInstanceAddr: null,
+            wethName: '', wethSymbol: '', wethDecimals: ''
+        };
+
+        // Token Data to be Stored in the State
+        this.token = {
+            tokenInstance: null, tokenIntanceAddr: null,
+            tokenName: '', tokenSymbol: '', tokenDecimals: '', tokenBalance: ''
+        };
+
+        // Crowdsale Data to be Store in the State
+        this.crowdsale = {
+            crowdsaleInstance: null, crowdsaleInstanceAddr: null,
+            crowdsaleRate: 0, crowdsaleGoal: 0, crowdsaleCap: 0, crowdsaleStart: 0,
+            crowdsaleClose: 0, crowdsaleRelease: 0, crowdsaleBalance:0 ,
+            crowdsaleState:false, crowdsaleOwner: false,
+            crowdsaleTokensLeft: 0, crowdsaleTokensUntilGoal: 0, crowdsaleInitTime: this.crowdsaleInitTime,
+        };
 
         this.state = {
             web3: null, accounts: null,
@@ -121,7 +137,7 @@ class App extends Component {
         }
 
         const {
-            mainContract, tokenContract,
+            mainContract, tokenContract, accounts,
             wethContract, mainContractAddr, wethContractAddr,
             tokenContractAddr, wethData, tokenData, crowdsaleData
         } = this.state;
@@ -131,7 +147,7 @@ class App extends Component {
         this.wethSymbol = await wethContract.methods.symbol().call();
         this.wethDecimals = await wethContract.methods.decimals().call();
 
-        // Promise all values so it garantees that the contracts will provide the information
+        // Promise all values so it guarantees that the contracts will provide the information
         Promise.all([this.wethName, this.wethSymbol, this.wethDecimals]);
         console.log('current state for weth data',this.wethName, this.wethSymbol, this.wethDecimals);
 
@@ -141,7 +157,7 @@ class App extends Component {
         this.tokenDecimals = await tokenContract.methods.decimals().call();
         this.tokenBalance = await tokenContract.methods.getAmount().call();
 
-        // Promise all values so it garantees that the contracts will provide the information
+        // Promise all values so it guarantees that the contracts will provide the information
         Promise.all([this.tokenName, this.tokenSymbol, this.tokenDecimals, this.tokenBalance]);
         console.log('current state for token data',this.tokenName, this.tokenSymbol, this.tokenDecimals, this.tokenBalance);
 
@@ -153,9 +169,14 @@ class App extends Component {
         this.crowdsaleRelease = ((await mainContract.methods.releaseTime().call()) - await mainContract.methods.closingTime().call()) / 60000;
         this.crowdsaleState = (await mainContract.methods.isCompleted().call()).toString();
 
-        // Promise all values so it garantees that the contracts will provide the information
-        Promise.all([this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState]);
-        console.log('current state for crowdsale data', this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState);
+        this.crowdsaleIsOwner = (await mainContract.methods.isOwner().call({'from':accounts[0]}));
+        this.crowdsaleTokensLeft = (await mainContract.methods.getTokenTotalSupply(mainContractAddr).call());
+        this.crowdsaleTokensUntilGoal = (this.crowdsaleGoal = await mainContract.methods.contributionGoal().call() - await mainContract.methods.currentContribution().call());
+        console.log("Token Status", String(this.crowdsaleTokensLeft).slice(0, String(this.crowdsaleTokensLeft).length -18), '/', String(this.crowdsaleTokensUntilGoal).slice(0, String(this.crowdsaleTokensUntilGoal).length -18));
+
+        // Promise all values so it guarantees that the contracts will provide the information
+        Promise.all([this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState, this.crowdsaleOwner]);
+        console.log('current state for crowdsale data', this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleIsOwner);
 
         // Save Current Status of the Contracts in state objects in case any component needs the current values
         wethData.wethName = this.wethName;
@@ -174,6 +195,8 @@ class App extends Component {
         crowdsaleData.crowdsaleClose = this.crowdsaleClose;
         crowdsaleData.crowdsaleRelease = this.crowdsaleRelease;
         crowdsaleData.crowdsaleState = this.crowdsaleState;
+        crowdsaleData.crowdsaleTokensLeft = this.crowdsaleTokensLeft;
+        crowdsaleData.crowdsaleTokensUntilGoal = this.crowdsaleTokensUntilGoal;
 
         this.setState({
             mainContract, tokenContract, wethContract,
@@ -202,7 +225,7 @@ class App extends Component {
                             tokenName={this.tokenName}
                             tokenSymbol={this.tokenSymbol}
                             tokenDecimals={this.tokenDecimals}
-                            tokenBalance={String(this.tokenBalance).slice(0,4)}
+                            tokenBalance={this.tokenBalance}
                         />
                         <CrowdsaleInformation
                             crowdsaleRate={this.crowdsaleRate}
@@ -212,6 +235,10 @@ class App extends Component {
                             crowdsaleClose={this.crowdsaleClose}
                             crowdsaleRelease={this.crowdsaleRelease}
                             crowdsaleState={this.crowdsaleState}
+                            crowdsaleTokensLeft={this.crowdsaleTokensLeft}
+                            crowdsaleTokensUntilGoal={this.crowdsaleTokensUntilGoal}
+                            crowdsaleInitTime={this.crowdsaleInitTime}
+
                         />
                     </div>
                 </center>

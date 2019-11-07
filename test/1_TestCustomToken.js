@@ -3,7 +3,7 @@
  */
 var myToken = artifacts.require("../contracts/tokens/CustomToken.sol");
 var myCustomCrowdsale = artifacts.require("../contracts/CustomCrowdsale.sol");
-
+const { ether } = require('@openzeppelin/test-helpers');
 contract('CustomToken', (accounts) => {
 
     /**
@@ -19,9 +19,9 @@ contract('CustomToken', (accounts) => {
             var currentTokenInCrowdsale = await myCustomTokenInstance.getBalance(myCustomCrowdsaleInstance.address);
 
             // Expected current value for totalSupply in CustomToken
-            var expectedSupply = 1000;
+            var expectedSupply = ether('1000');
 
-            assert.equal(currentTokenInCrowdsale, expectedSupply, 'Token Contract should have atleast 1000 after inicialization');
+            assert.equal(String(currentTokenInCrowdsale), String(expectedSupply), 'Token Contract should have atleast 1000 after inicialization');
         } catch(err) {
             console.log(err.message);
         }

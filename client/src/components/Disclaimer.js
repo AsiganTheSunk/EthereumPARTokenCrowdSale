@@ -3,7 +3,7 @@ import React from 'react';
 function Disclaimer() {
     const divstyle = {
         backgroundColor: 'lightgrey',
-        width: 800,
+        width: 860,
         alignSelf: 'center',
         padding: 10,
     };

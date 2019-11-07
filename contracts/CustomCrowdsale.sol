@@ -145,6 +145,10 @@ contract CustomCrowdsale is Ownable {
         return false;
     }
 
+//    function isOwner(address aux) public view returns (bool){
+//        return aux == this.owner();
+//    }
+
     // Total Tokens held in the CustomCrowdsale
     function getTokenTotalSupply(address src) public view returns(uint) {
         return token.getBalance(src);

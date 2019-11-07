@@ -7,11 +7,10 @@ class BuyForm extends React.Component {
         super(props);
         this.state = {
             value: '',
-            isBuyButtonDisabled: false,
-            isClaimButtonDisabled: false,
+            isBuyButtonDisabled: true,
+            isClaimButtonDisabled: true,
             isCloseCrowdsaleDisable: false,
             errorMessage: ' ',
-
             accounts: this.props.accounts,
             mainContract: this.props.mainContract,
             mainContractAddr: this.props.mainContractAddr,
@@ -20,7 +19,6 @@ class BuyForm extends React.Component {
             tokenContractAddr: this.props.tokenContractAddr,
             wethContract: this.props.wethContract,
             wethContractAddr: this.props.wethContractAddr,
-
             currentValue: 0
         };
 
@@ -44,8 +42,9 @@ class BuyForm extends React.Component {
             const { accounts, mainContract } = this.state;
             await mainContract.methods.closeCustomCrowdsale().send({'from': accounts[0]});
             const crowdsaleRelease = await mainContract.methods.releaseTime().call();
-
+            console.log('Closing Crowdsale');
             await time.increaseTo(crowdsaleRelease);
+            console.log('Increasing Time in Local BChain');
         } catch(err){
             console.log(err.message);
         }
@@ -60,17 +59,14 @@ class BuyForm extends React.Component {
             console.log(this.state.mainContract, this.state.mainContractAddr);
             console.log(this.state.wethContract, this.state.wethContractAddr);
             console.log(this.state.tokenContract, this.state.tokenContractAddr);
-
             var weiAmount = Web3.utils.toWei(currentAmount.toString());
             console.log('+ Current Wei Amount: ' + weiAmount);
 
-            // ADD RATE IN THE APPROVAL?
             await wethContract.methods.deposit().send({'value': weiAmount, 'from': accounts[0]});
             await wethContract.methods.approve(mainContractAddr, weiAmount).send({'from':accounts[0]});
             await mainContract.methods.buyToken().send({'from':accounts[0], 'value': String(weiAmount)});
             var ctcAmount = new BN(String(weiAmount * crowdsaleData.crowdsaleRate));
             await tokenContract.methods.approve(mainContractAddr, String(ctcAmount)).send({'from':accounts[0]});
-
         } catch(err){
             console.log('Single Operation Buy Tokens Crashing');
             console.log(err.message);
@@ -94,7 +90,7 @@ class BuyForm extends React.Component {
             } else if (eventVarValue  > Number(0)) {
                 this.setState({isBuyButtonDisabled: false, isClaimButtonDisabled: false,  isCloseCrowdsaleDisable: false, currentValue: eventVarValue});
             } else {
-                this.setState({isBuyButtonDisabled: true, isClaimButtonDisabled: true,  isCloseCrowdsaleDisable: true});
+                this.setState({isBuyButtonDisabled: true, isClaimButtonDisabled: true,  isCloseCrowdsaleDisable: false});
             }
         }
         this.setState({errorMessage: eventErrorMesage});
@@ -124,30 +120,53 @@ class BuyForm extends React.Component {
     }
 
     render() {
+        const { crowdsaleData } = this.state;
         const input_style = {
             alignSelf: 'center',
             padding: 2,
             margin: 3
         };
-        return (
-            <div>
-                <form>
+        if (!crowdsaleData.crowdsaleIsOwner) {
+            return (
+                <div>
+                    <form>
+                            <center>
+                                <br/>
+                                <b>Enter your desired CustomToken Amount:</b>
+                                <br/>
+                                <input type='text' style= {input_style} name='Amount' onChange={this.handleChange}/>
+                            </center>
+                    </form>
+                    <center>
+                        <button style= {input_style} disabled={this.state.isBuyButtonDisabled} onClick={this.handleBuyClick}> Buy (Single-Tx) </button>
+                        <button style= {input_style} disabled={this.state.isClaimButtonDisabled} onClick={this.handleClaimClick}> Claim (Single-Tx) </button>
+                        <button style= {input_style} disabled={this.state.isCloseCrowdsaleDisable} onClick={this.handleCloseClick}> Close Crowdsale (Debug) </button>
+                        <br/>
+                       {this.state.errorMessage}
+                    </center>
+                </div>
+            )
+        }
+        else {
+            return (
+                <div>
+                    <form>
                         <center>
                             <br/>
                             <b>Enter your desired CustomToken Amount:</b>
                             <br/>
                             <input type='text' style= {input_style} name='Amount' onChange={this.handleChange}/>
                         </center>
-                </form>
-                <center>
-                    <button style= {input_style} disabled={this.state.isBuyButtonDisabled} onClick={this.handleBuyClick}> Buy (Single-Tx) </button>
-                    <button style= {input_style} disabled={this.state.isClaimButtonDisabled} onClick={this.handleClaimClick}> Claim (Single-Tx) </button>
-                    <button style= {input_style} disabled={this.state.isCloseCrowdsaleDisable} onClick={this.handleCloseClick}> Close Crowdsale (Debug) </button>
-                    <br/>
-                   {this.state.errorMessage}
-                </center>
-            </div>
-        )
+                    </form>
+                    <center>
+                        <button style= {input_style} disabled={this.state.isBuyButtonDisabled} onClick={this.handleBuyClick}> Buy (Single-Tx) </button>
+                        <button style= {input_style} disabled={this.state.isClaimButtonDisabled} onClick={this.handleClaimClick}> Claim (Single-Tx) </button>
+                        <br/>
+                        {this.state.errorMessage}
+                    </center>
+                </div>
+            )
+        }
     }
 };
 
