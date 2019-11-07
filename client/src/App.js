@@ -85,18 +85,21 @@ class App extends Component {
             const accounts = await web3.eth.getAccounts();
             const networkId = await web3.eth.net.getId();
 
+            // Retrieving the current Artifact for the Crowdsale Contract
             const deployedNetworkCrowdsale = crowdsaleArtifact.networks[networkId];
             const crowdsaleInstance = new web3.eth.Contract(
                 crowdsaleArtifact.abi,
                 deployedNetworkCrowdsale && deployedNetworkCrowdsale.address,
             );
 
+            // Retrivieving the current Artifact for the Custom Token
             const deployedNetworkToken = tokenArtifact.networks[networkId];
             const tokenInstance = new web3.eth.Contract(
                 tokenArtifact.abi,
                 deployedNetworkToken && deployedNetworkToken.address,
             );
 
+            // Retrieving the current Artifact for the Weth
             const deployedNetworkWeth = wethArtifact.networks[networkId];
             const wethInstance = new web3.eth.Contract(
                 wethArtifact.abi,
@@ -113,12 +116,10 @@ class App extends Component {
                 tokenContractAddr: deployedNetworkToken.address,
                 networkId,  });
         } catch (err) {
-            // Catch any errors for any of the above operations.
             alert(`Failed to load web3, accounts, or contract. Check console for details.`);
             console.error(err);
         }
 
-        //TODO: Clean Up This Mess
         const {
             mainContract, tokenContract,
             wethContract, mainContractAddr, wethContractAddr,
@@ -130,6 +131,7 @@ class App extends Component {
         this.wethSymbol = await wethContract.methods.symbol().call();
         this.wethDecimals = await wethContract.methods.decimals().call();
 
+        // Promise all values so it garantees that the contracts will provide the information
         Promise.all([this.wethName, this.wethSymbol, this.wethDecimals]);
         console.log('current state for weth data',this.wethName, this.wethSymbol, this.wethDecimals);
 
@@ -138,6 +140,8 @@ class App extends Component {
         this.tokenSymbol = await tokenContract.methods.symbol().call();
         this.tokenDecimals = await tokenContract.methods.decimals().call();
         this.tokenBalance = await tokenContract.methods.getAmount().call();
+
+        // Promise all values so it garantees that the contracts will provide the information
         Promise.all([this.tokenName, this.tokenSymbol, this.tokenDecimals, this.tokenBalance]);
         console.log('current state for token data',this.tokenName, this.tokenSymbol, this.tokenDecimals, this.tokenBalance);
 
@@ -148,11 +152,12 @@ class App extends Component {
         this.crowdsaleClose = (await mainContract.methods.closingTime().call() - await mainContract.methods.startingTime().call())/ 60000;
         this.crowdsaleRelease = ((await mainContract.methods.releaseTime().call()) - await mainContract.methods.closingTime().call()) / 60000;
         this.crowdsaleState = (await mainContract.methods.isCompleted().call()).toString();
-        // Beware of the ganache-cli, let it rest beetween relaunches
+
+        // Promise all values so it garantees that the contracts will provide the information
         Promise.all([this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState]);
         console.log('current state for crowdsale data', this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState);
 
-        // Save Current Status of the Contracts in state objects.
+        // Save Current Status of the Contracts in state objects in case any component needs the current values
         wethData.wethName = this.wethName;
         wethData.wethSymbol = this.wethSymbol;
         wethData.wethDecimals =  this.wethDecimals;
