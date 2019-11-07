@@ -39,11 +39,11 @@ class BuyForm extends React.Component {
         }
     };
 
-    closeICO = async () => {
+    closeCrowdsale = async () => {
         try {
             const { accounts, mainContract } = this.state;
-            await mainContract.methods.closeICO().send({'from': accounts[0]});
-            const crowdsaleRelease = await mainContract.methods.getReleaseTime().call();
+            await mainContract.methods.closeCustomCrowdsale().send({'from': accounts[0]});
+            const crowdsaleRelease = await mainContract.methods.releaseTime().call();
 
             await time.increaseTo(crowdsaleRelease);
         } catch(err){
@@ -78,6 +78,7 @@ class BuyForm extends React.Component {
     };
 
     handleChange = (event) => {
+        const { accounts, mainContract } = this.state;
         event.preventDefault();
         let eventVarName = event.target.name;
         let eventVarValue = event.target.value;
@@ -85,14 +86,15 @@ class BuyForm extends React.Component {
         if (eventVarName === "Amount") {
             if (eventVarValue !=='' && !Number(eventVarValue)) {
                 eventErrorMesage = <strong> The cuantity must be a number </strong>;
-                this.setState({isBuyButtonDisabled: true});
+                this.setState({isBuyButtonDisabled: true, isClaimButtonDisabled: true});
             }
-            else if (eventVarValue  < Number(0)) {
+            else if (eventVarValue ===' ' || eventVarValue  < Number(0)) {
                 eventErrorMesage = <strong> The cuantity must be over 0 </strong>;
-                this.setState({isBuyButtonDisabled: true});
+                this.setState({isBuyButtonDisabled: true, isClaimButtonDisabled: true,  isCloseCrowdsaleDisable: true});
+            } else if (eventVarValue  > Number(0)) {
+                this.setState({isBuyButtonDisabled: false, isClaimButtonDisabled: false,  isCloseCrowdsaleDisable: false, currentValue: eventVarValue});
             } else {
-                console.log('else statement');
-                this.setState({isBuyButtonDisabled: false, currentValue: eventVarValue});
+                this.setState({isBuyButtonDisabled: true, isClaimButtonDisabled: true,  isCloseCrowdsaleDisable: true});
             }
         }
         this.setState({errorMessage: eventErrorMesage});
@@ -101,7 +103,7 @@ class BuyForm extends React.Component {
     // Handle Close ICO for Debugging
     handleCloseClick(event) {
         event.preventDefault();
-        this.closeICO();
+        this.closeCrowdsale();
     }
 
     // Handle Single Click Operations
@@ -139,8 +141,8 @@ class BuyForm extends React.Component {
                 </form>
                 <center>
                     <button style= {input_style} disabled={this.state.isBuyButtonDisabled} onClick={this.handleBuyClick}> Buy (Single-Tx) </button>
-                    <button style= {input_style} disabled={this.state.isBuyButtonDisabled} onClick={this.handleClaimClick}> Claim (Single-Tx) </button>
-                    <button style= {input_style} disabled={this.state.isBuyButtonDisabled} onClick={this.handleCloseClick}> Close Crowdsale (Debug) </button>
+                    <button style= {input_style} disabled={this.state.isClaimButtonDisabled} onClick={this.handleClaimClick}> Claim (Single-Tx) </button>
+                    <button style= {input_style} disabled={this.state.isCloseCrowdsaleDisable} onClick={this.handleCloseClick}> Close Crowdsale (Debug) </button>
                     <br/>
                    {this.state.errorMessage}
                 </center>
