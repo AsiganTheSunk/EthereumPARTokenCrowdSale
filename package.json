@@ -7,7 +7,7 @@
     "assert": "^2.0.0",
     "bulma-start": "0.0.3",
     "canonical-weth": "^1.4.0",
-    "openzeppelin-solidity": "^2.3.0",
+    "openzeppelin-solidity": "^2.4.0",
     "react": "^16.11.0",
     "react-countdown-now": "^2.1.2",
     "react-dom": "^16.11.0",
