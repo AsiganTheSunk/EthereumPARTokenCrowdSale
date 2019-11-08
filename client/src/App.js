@@ -99,9 +99,15 @@ class App extends Component {
         //this.componentWillUpdate();
     };
 
-    // componentWillUpdate() {
-    //     setInterval(() => this.setState({ web3: getWeb3 }), 1000);
-    // }
+    async refreshWeb3() {
+        var currentAccount = await getWeb3();
+        return currentAccount;
+    }
+
+     componentWillUpdate() {
+
+        setInterval(() => this.setState({ web3: this.refreshWeb3() }), 1000);
+    }
 
     // Method for loading Contracts Deployed in the Network
     async loadContractArtifacts() {
