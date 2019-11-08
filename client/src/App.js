@@ -1,9 +1,6 @@
 // Import React & React Components
 import React, { Component } from 'react'
 
-// Import Crowdsale Styles
-import './App.css'
-
 // Import getWeb3Provider & Web3
 import getWeb3 from "./utils/getWeb3";
 //import Web3 from 'web3';
@@ -26,14 +23,11 @@ import BuyForm from "./components/BuyForm"
 // Import utils module
 import getNetworkName from './utils/getNerworkName'
 
-
-
 class App extends Component {
     constructor(props) {
         super(props);
         this.appName = 'CustomTokenCrodwsale';
 
-        this.crowdsaleInitTime = Date.now();
         // Crowdsale Static Data Variables
         this.crowdsaleRate = 0;
         this.crowdsaleGoal = 0;
@@ -48,14 +42,14 @@ class App extends Component {
 
         // Token & Weth Static Data Variables
         this.wethName = '';
-        this.wethSymbol = '';
-        this.wethDecimals = '';
+        this.wethSymbol = 0;
+        this.wethDecimals = 0;
         this.tokenName = '';
         this.tokenSymbol = '';
-        this.tokenDecimals = '';
-        this.tokenBalance = '';
+        this.tokenDecimals = 0;
+        this.tokenBalance = 0;
 
-        // TODO: Move Data to the proper State Varibles
+        // TODO: Instance & Instance Address should be m oved to the Stat variable to have a more compact code. (Not Sure if it's the right move).
         // Weth Data to be Stored in the State
         this.weth = {
             wethInstance: null, wethInstanceAddr: null,
@@ -88,25 +82,24 @@ class App extends Component {
     }
 
 
+
+
     // LOADING CONTRACT AND NETWORK DATA
     componentDidMount() {
         this.loadContractArtifacts();
         const { networkId } = this.state;
 
         // setInterval to check MetaMask
-        // setInterval(() => this.setState({ web3: getWeb3() }), 1000);
+        // setInterval(() => this.setState({ web3: getWeb3() }), 100);
         this.setState({ networkName: getNetworkName(networkId)});
         //this.componentWillUpdate();
     };
 
-    async refreshWeb3() {
-        var currentAccount = await getWeb3();
-        return currentAccount;
-    }
-
-     componentWillUpdate() {
-
-        setInterval(() => this.setState({ web3: this.refreshWeb3() }), 1000);
+    refreshWeb3AccountData() {
+        window.ethereum.on('accountsChanged', function () {
+            window.location.reload();
+            console.log('Metamask Account Change Detected, Reloading Landing Page')
+        });
     }
 
     // Method for loading Contracts Deployed in the Network
@@ -165,7 +158,7 @@ class App extends Component {
 
         // Promise all values so it guarantees that the contracts will provide the information
         Promise.all([this.wethName, this.wethSymbol, this.wethDecimals]);
-        console.log('current state for weth data',this.wethName, this.wethSymbol, this.wethDecimals);
+        console.log('WETH Contract Data',this.wethName, this.wethSymbol, this.wethDecimals);
 
         // Get static values from the contract CustomToken to prove it was correctly loaded by Web3js
         this.tokenName = await tokenContract.methods.name().call();
@@ -175,7 +168,7 @@ class App extends Component {
 
         // Promise all values so it guarantees that the contracts will provide the information
         Promise.all([this.tokenName, this.tokenSymbol, this.tokenDecimals, this.tokenBalance]);
-        console.log('current state for token data',this.tokenName, this.tokenSymbol, this.tokenDecimals, this.tokenBalance);
+        console.log('Token Contract Data',this.tokenName, this.tokenSymbol, this.tokenDecimals, this.tokenBalance);
 
         // Get static values from the contract CustomCrowdsale to prove it was correctly loaded by Web3js
         this.crowdsaleRate = await mainContract.methods.rate().call();
@@ -191,18 +184,16 @@ class App extends Component {
 
         // Promise all values so it guarantees that the contracts will provide the information
         Promise.all([this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState, this.crowdsaleIsOwner]);
-        console.log('current state for crowdsale data', this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleIsOwner);
+        console.log('Crowdsale Contract Data', this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleIsOwner);
 
         // Save Current Status of the Contracts in state objects in case any component needs the current values
         wethData.wethName = this.wethName;
         wethData.wethSymbol = this.wethSymbol;
         wethData.wethDecimals =  this.wethDecimals;
-
         tokenData.tokenName = this.tokenName;
         tokenData.tokenSymbol = this.tokenSymbol;
         tokenData.tokenDecimals = this.tokenDecimals;
         tokenData.tokenBalance = this.tokenBalance;
-
         crowdsaleData.crowdsaleRate = this.crowdsaleRate;
         crowdsaleData.crowdsaleCap = this.crowdsaleCap;
         crowdsaleData.crowdsaleGoal = this.crowdsaleGoal;
@@ -222,6 +213,7 @@ class App extends Component {
     };
 
     render() {
+        this.refreshWeb3AccountData();
         if (!this.state.web3) {
             return (<LoadingMessage/>);
         }

@@ -74,7 +74,6 @@ class BuyForm extends React.Component {
     };
 
     handleChange = (event) => {
-        const { accounts, mainContract } = this.state;
         event.preventDefault();
         let eventVarName = event.target.name;
         let eventVarValue = event.target.value;

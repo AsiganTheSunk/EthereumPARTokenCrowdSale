@@ -1,5 +1,4 @@
 import React from 'react';
-import Countdown from 'react-countdown-now';
 
 function CrowdsaleInformation(props) {
     return (
@@ -20,9 +19,5 @@ function CrowdsaleInformation(props) {
         </div>
     )
 }
-//             <b> Time Left Until Natural Close: </b>  <Countdown date={props.crowdsaleInitTime + (props.crowdsaleClose * 60000)} />
-//             <br/>
-//             <b> Time Left Until Natural Release: </b>  <Countdown date={props.crowdsaleInitTime + ((props.crowdsaleClose  + props.crowdsaleRelease) * 60000)} />
-//             <br/>
 
 export default CrowdsaleInformation;
