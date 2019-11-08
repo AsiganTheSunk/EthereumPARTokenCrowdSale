@@ -26,7 +26,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
  * ICOGoalReached - Value Defining the status for the contributionGoal in CustomCrowdsale
  * contributions - Value Defining the every buy until claim in CustomCrowdsale
  */
-contract CustomCrowdsale is OcrowdsaleIsOwnerwnable {
+contract CustomCrowdsale is Ownable {
     using SafeMath for uint;
 
     // Tokens To Exchange during the CustomCrowdsale

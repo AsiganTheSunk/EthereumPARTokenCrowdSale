@@ -131,6 +131,7 @@ class App extends Component {
                 wethContractAddr: deployedNetworkWeth.address,
                 tokenContractAddr: deployedNetworkToken.address,
                 networkId,  });
+            
         } catch (err) {
             alert(`Failed to load web3, accounts, or contract. Check console for details.`);
             console.error(err);
