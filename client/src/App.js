@@ -87,12 +87,21 @@ class App extends Component {
         };
     }
 
+
     // LOADING CONTRACT AND NETWORK DATA
     componentDidMount() {
         this.loadContractArtifacts();
         const { networkId } = this.state;
+
+        // setInterval to check MetaMask
+        // setInterval(() => this.setState({ web3: getWeb3() }), 1000);
         this.setState({ networkName: getNetworkName(networkId)});
+        //this.componentWillUpdate();
     };
+
+    // componentWillUpdate() {
+    //     setInterval(() => this.setState({ web3: getWeb3 }), 1000);
+    // }
 
     // Method for loading Contracts Deployed in the Network
     async loadContractArtifacts() {

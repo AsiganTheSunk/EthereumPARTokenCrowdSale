@@ -67,6 +67,7 @@ contract CustomCrowdsale is Ownable {
     modifier whenIsNotCompleted {
         require(!isCompleted, 'CustomCrowdsale Is Completed');
         require(closingTime >= now, 'CustomCrowdsale closing time is not there jet');
+        require(now >= startingTime, 'CustomCrowdsale To Early to buyToken');
         _;
     }
 
