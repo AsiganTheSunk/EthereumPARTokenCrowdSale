@@ -1,9 +1,6 @@
 // Import React & React Components
 import React, { Component } from 'react'
 
-// Import Crowdsale Styles
-import './App.css'
-
 // Import getWeb3Provider & Web3
 import getWeb3 from "./utils/getWeb3";
 //import Web3 from 'web3';
@@ -26,8 +23,6 @@ import BuyForm from "./components/BuyForm"
 // Import utils module
 import getNetworkName from './utils/getNerworkName'
 
-
-
 class App extends Component {
     constructor(props) {
         super(props);
@@ -40,26 +35,41 @@ class App extends Component {
         this.crowdsaleStart = 0;
         this.crowdsaleRelease = 0;
         this.crowdsaleClose = 0;
-        this.crowdsaleBalance = 0;
-
-        // Crowdsale Dinamic Data Variables
-        this.crowdsaleTokenSupply = 0;
-        this.crowdsaleWethSupply = 0;
-        this.crowdsaleContribution = 0;
+        this.crowdsaleTokensLeft = 0;
+        this.crowdsaleTokensUntilGoal = 0;
+        this.crowdsaleIsOwner = false;
         this.crowdsaleState = false;
 
         // Token & Weth Static Data Variables
         this.wethName = '';
-        this.wethSymbol = '';
-        this.wethDecimals = '';
+        this.wethSymbol = 0;
+        this.wethDecimals = 0;
         this.tokenName = '';
         this.tokenSymbol = '';
-        this.tokenDecimals = '';
-        this.tokenBalance = '';
+        this.tokenDecimals = 0;
+        this.tokenBalance = 0;
 
-        this.weth = { wethName: '', wethSymbol: '', wethDecimals: '' };
-        this.token = { tokenName: '', tokenSymbol: '', tokenDecimals: '', tokenBalance: ''};
-        this.crowdsale = {crowdsaleRate: 0, crowdsaleGoal: 0, crowdsaleCap: 0, crowdsaleStart: 0, crowdsaleClose: 0, crowdsaleRelease: 0, crowdsaleBalance:0 , crowdsaleState:false };
+        // TODO: Instance & Instance Address should be m oved to the Stat variable to have a more compact code. (Not Sure if it's the right move).
+        // Weth Data to be Stored in the State
+        this.weth = {
+            wethInstance: null, wethInstanceAddr: null,
+            wethName: '', wethSymbol: '', wethDecimals: ''
+        };
+
+        // Token Data to be Stored in the State
+        this.token = {
+            tokenInstance: null, tokenIntanceAddr: null,
+            tokenName: '', tokenSymbol: '', tokenDecimals: '', tokenBalance: ''
+        };
+
+        // Crowdsale Data to be Store in the State
+        this.crowdsale = {
+            crowdsaleInstance: null, crowdsaleInstanceAddr: null,
+            crowdsaleRate: 0, crowdsaleGoal: 0, crowdsaleCap: 0, crowdsaleStart: 0,
+            crowdsaleClose: 0, crowdsaleRelease: 0, crowdsaleBalance:0 ,
+            crowdsaleState:false, crowdsaleOwner: false, crowdsaleIsOwner: null,
+            crowdsaleTokensLeft: 0, crowdsaleTokensUntilGoal: 0, crowdsaleInitTime: this.crowdsaleInitTime,
+        };
 
         this.state = {
             web3: null, accounts: null,
@@ -71,12 +81,26 @@ class App extends Component {
         };
     }
 
+
+
+
     // LOADING CONTRACT AND NETWORK DATA
     componentDidMount() {
         this.loadContractArtifacts();
         const { networkId } = this.state;
+
+        // setInterval to check MetaMask
+        // setInterval(() => this.setState({ web3: getWeb3() }), 100);
         this.setState({ networkName: getNetworkName(networkId)});
+        //this.componentWillUpdate();
     };
+
+    refreshWeb3AccountData() {
+        window.ethereum.on('accountsChanged', function () {
+            window.location.reload();
+            console.log('Metamask Account Change Detected, Reloading Landing Page')
+        });
+    }
 
     // Method for loading Contracts Deployed in the Network
     async loadContractArtifacts() {
@@ -85,18 +109,21 @@ class App extends Component {
             const accounts = await web3.eth.getAccounts();
             const networkId = await web3.eth.net.getId();
 
+            // Retrieving the current Artifact for the Crowdsale Contract
             const deployedNetworkCrowdsale = crowdsaleArtifact.networks[networkId];
             const crowdsaleInstance = new web3.eth.Contract(
                 crowdsaleArtifact.abi,
                 deployedNetworkCrowdsale && deployedNetworkCrowdsale.address,
             );
 
+            // Retrivieving the current Artifact for the Custom Token
             const deployedNetworkToken = tokenArtifact.networks[networkId];
             const tokenInstance = new web3.eth.Contract(
                 tokenArtifact.abi,
                 deployedNetworkToken && deployedNetworkToken.address,
             );
 
+            // Retrieving the current Artifact for the Weth
             const deployedNetworkWeth = wethArtifact.networks[networkId];
             const wethInstance = new web3.eth.Contract(
                 wethArtifact.abi,
@@ -112,15 +139,14 @@ class App extends Component {
                 wethContractAddr: deployedNetworkWeth.address,
                 tokenContractAddr: deployedNetworkToken.address,
                 networkId,  });
+            
         } catch (err) {
-            // Catch any errors for any of the above operations.
             alert(`Failed to load web3, accounts, or contract. Check console for details.`);
             console.error(err);
         }
 
-        //TODO: Clean Up This Mess
         const {
-            mainContract, tokenContract,
+            mainContract, tokenContract, accounts,
             wethContract, mainContractAddr, wethContractAddr,
             tokenContractAddr, wethData, tokenData, crowdsaleData
         } = this.state;
@@ -130,38 +156,44 @@ class App extends Component {
         this.wethSymbol = await wethContract.methods.symbol().call();
         this.wethDecimals = await wethContract.methods.decimals().call();
 
+        // Promise all values so it guarantees that the contracts will provide the information
         Promise.all([this.wethName, this.wethSymbol, this.wethDecimals]);
-        console.log('current state for weth data',this.wethName, this.wethSymbol, this.wethDecimals);
+        console.log('WETH Contract Data',this.wethName, this.wethSymbol, this.wethDecimals);
 
         // Get static values from the contract CustomToken to prove it was correctly loaded by Web3js
         this.tokenName = await tokenContract.methods.name().call();
         this.tokenSymbol = await tokenContract.methods.symbol().call();
         this.tokenDecimals = await tokenContract.methods.decimals().call();
         this.tokenBalance = await tokenContract.methods.getAmount().call();
+
+        // Promise all values so it guarantees that the contracts will provide the information
         Promise.all([this.tokenName, this.tokenSymbol, this.tokenDecimals, this.tokenBalance]);
-        console.log('current state for token data',this.tokenName, this.tokenSymbol, this.tokenDecimals, this.tokenBalance);
+        console.log('Token Contract Data',this.tokenName, this.tokenSymbol, this.tokenDecimals, this.tokenBalance);
 
         // Get static values from the contract CustomCrowdsale to prove it was correctly loaded by Web3js
-        this.crowdsaleRate = await mainContract.methods.getRate().call();
-        this.crowdsaleCap = await mainContract.methods.getCap().call();
-        this.crowdsaleGoal = await mainContract.methods.getGoal().call();
-        this.crowdsaleClose = (await mainContract.methods.getClosingTime().call() - await mainContract.methods.getStartingTime().call())/ 60000;
-        this.crowdsaleRelease = ((await mainContract.methods.getReleaseTime().call()) - await mainContract.methods.getClosingTime().call()) / 60000;
+        this.crowdsaleRate = await mainContract.methods.rate().call();
+        this.crowdsaleCap = await mainContract.methods.cap().call();
+        this.crowdsaleGoal = await mainContract.methods.contributionGoal().call();
+        this.crowdsaleClose = (await mainContract.methods.closingTime().call() - await mainContract.methods.startingTime().call())/ 60000;
+        this.crowdsaleRelease = ((await mainContract.methods.releaseTime().call()) - await mainContract.methods.closingTime().call()) / 60000;
         this.crowdsaleState = (await mainContract.methods.isCompleted().call()).toString();
-        // Beware of the ganache-cli, let it rest beetween relaunches
-        Promise.all([this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState]);
-        console.log('current state for crowdsale data', this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState);
+        this.crowdsaleIsOwner = (await mainContract.methods.isOwner().call({'from':accounts[0]}));
+        this.crowdsaleTokensLeft = (await mainContract.methods.getTokenTotalSupply(mainContractAddr).call());
+        this.crowdsaleTokensUntilGoal = (this.crowdsaleGoal = await mainContract.methods.contributionGoal().call() - await mainContract.methods.currentContribution().call());
+        console.log("Token Status", String(this.crowdsaleTokensLeft).slice(0, String(this.crowdsaleTokensLeft).length -18), '/', String(this.crowdsaleTokensUntilGoal).slice(0, String(this.crowdsaleTokensUntilGoal).length -18));
 
-        // Save Current Status of the Contracts in state objects.
+        // Promise all values so it guarantees that the contracts will provide the information
+        Promise.all([this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleState, this.crowdsaleIsOwner]);
+        console.log('Crowdsale Contract Data', this.crowdsaleRate, this.crowdsaleCap, this.crowdsaleGoal, this.crowdsaleStart, this.crowdsaleClose, this.crowdsaleRelease, this.crowdsaleIsOwner);
+
+        // Save Current Status of the Contracts in state objects in case any component needs the current values
         wethData.wethName = this.wethName;
         wethData.wethSymbol = this.wethSymbol;
         wethData.wethDecimals =  this.wethDecimals;
-
         tokenData.tokenName = this.tokenName;
         tokenData.tokenSymbol = this.tokenSymbol;
         tokenData.tokenDecimals = this.tokenDecimals;
         tokenData.tokenBalance = this.tokenBalance;
-
         crowdsaleData.crowdsaleRate = this.crowdsaleRate;
         crowdsaleData.crowdsaleCap = this.crowdsaleCap;
         crowdsaleData.crowdsaleGoal = this.crowdsaleGoal;
@@ -169,6 +201,9 @@ class App extends Component {
         crowdsaleData.crowdsaleClose = this.crowdsaleClose;
         crowdsaleData.crowdsaleRelease = this.crowdsaleRelease;
         crowdsaleData.crowdsaleState = this.crowdsaleState;
+        crowdsaleData.crowdsaleTokensLeft = this.crowdsaleTokensLeft;
+        crowdsaleData.crowdsaleTokensUntilGoal = this.crowdsaleTokensUntilGoal;
+        crowdsaleData.crowdsaleIsOwner = this.crowdsaleIsOwner;
 
         this.setState({
             mainContract, tokenContract, wethContract,
@@ -178,6 +213,7 @@ class App extends Component {
     };
 
     render() {
+        this.refreshWeb3AccountData();
         if (!this.state.web3) {
             return (<LoadingMessage/>);
         }
@@ -197,7 +233,7 @@ class App extends Component {
                             tokenName={this.tokenName}
                             tokenSymbol={this.tokenSymbol}
                             tokenDecimals={this.tokenDecimals}
-                            tokenBalance={String(this.tokenBalance).slice(0,4)}
+                            tokenBalance={this.tokenBalance}
                         />
                         <CrowdsaleInformation
                             crowdsaleRate={this.crowdsaleRate}
@@ -207,6 +243,10 @@ class App extends Component {
                             crowdsaleClose={this.crowdsaleClose}
                             crowdsaleRelease={this.crowdsaleRelease}
                             crowdsaleState={this.crowdsaleState}
+                            crowdsaleTokensLeft={this.crowdsaleTokensLeft}
+                            crowdsaleTokensUntilGoal={this.crowdsaleTokensUntilGoal}
+                            crowdsaleInitTime={this.crowdsaleInitTime}
+
                         />
                     </div>
                 </center>
